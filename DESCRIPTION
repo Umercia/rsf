@@ -1,11 +1,12 @@
 Package: rsf
-Title: What the Package Does (one line, title case)
+Title: rsf (basic manipulations and visualisation of wind ressource map files)
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Maurice", "Clere", email = "cleremaurice@yahoo.fr",
+                  role = c("aut", "cre"))
+Description: *.rsf file manipulation and visualisation (rsf: Wind Ressource map format). Main functionalities: crop, convert 36 Sectors to 12 Sectors, plot (map) of average wind speed, A, k and shear per sectors, expot wind shear table.
 Depends:
     R (>= 3.2.3)
-License: What license is it under?
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 5.0.1
