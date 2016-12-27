@@ -6,7 +6,7 @@
 \usage{
 RSF_convert(rsf_file1, output_name = rsf_file1, crop = FALSE,
   layout_csv = NULL, crop_buffer = 700, twelve_S = FALSE,
-  rsf_file2 = NULL, shear_out = FALSE, three_D = TRUE, layer_H = NULL)
+  rsf_file2 = NULL, shear_out = FALSE, three_D = FALSE, layer_H = NULL)
 }
 \arguments{
 \item{rsf_file1:}{Input *.rsf file name (name should be surounded by "").}

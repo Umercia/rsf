@@ -31,7 +31,7 @@
 #' crop, convert to 12 sector, create a 3 dimensional rsf (containing the 112,137 ad 142m levels) and also export the shear table.
 #' RSF_convert(rsf_file1 = "Aldermyrberget 166m.rsf",crop = TRUE,layout_csv = "layout V14A.csv",twelve_S = TRUE,layer_H = c(112,137,142), three_D = TRUE, rsf_file2 = "Aldermyrberget 103m.rsf",shear_out = TRUE)
 #'
-RSF_convert <-function(rsf_file1,
+RSF_convert <- function(rsf_file1,
                          output_name = rsf_file1,
                          crop = FALSE,
                          layout_csv = NULL,
@@ -41,18 +41,18 @@ RSF_convert <-function(rsf_file1,
                          shear_out = FALSE,
                          three_D = FALSE,
                          layer_H = NULL) {
-    
+
         library("data.table")
-        
+
         # read and parse data -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
         rsf_H1 <- Read_RSF(rsf_file1)
         H1 <- unique(rsf_H1[, Height])
-        
+
         if (!is.null(rsf_file2)) {
             rsf2 <- TRUE
             rsf_H2 <- Read_RSF(rsf_file2)
             H2 <- unique(rsf_H2[, Height])
-            
+
             if (length(rsf_H1) != length(rsf_H2)) {
                 stop("The inputs rsf file dimension do not match, Check the coherence of the two *.rsf files")
             } else if (abs(H1 - H2) < 20) {
@@ -61,14 +61,14 @@ RSF_convert <-function(rsf_file1,
         } else {
             rsf2 <- FALSE
         }
-        
-        
-        
+
+
+
         if (!is.null(layout_csv)) {
             layout <- read.csv(layout_csv)
             names(layout) <- c("X", "Y")
             layout <- layout[complete.cases(layout), ]
-            
+
             if (length(layout) != 2) {
                 stop(
                     "Check that the layout file is a *.csv file with two columns using ",
@@ -81,37 +81,37 @@ RSF_convert <-function(rsf_file1,
                 stop("At least one position of the layout seems outside the rsf area: Check your positions and the coherence of the coordinate systems")
             }
         }
-        
-        
+
+
         # Crop files -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-        
-        
+
+
         if (crop == TRUE) {
             Xmax <- max(layout[, 1] + crop_buffer)
             Xmin <- min(layout[, 1] - crop_buffer)
             Ymax <- max(layout[, 2] + crop_buffer)
             Ymin <- min(layout[, 2] - crop_buffer)
-            
+
             rsf_H1 <- Crop_RSF(rsf_H1, Xmax, Xmin, Ymax, Ymin)
-            
+
             if (rsf2 == TRUE) {
                 rsf_H2 <- Crop_RSF(rsf_H2, Xmax, Xmin, Ymax, Ymin)
             }
-            
+
             output_name <- paste("[crop_", crop_buffer, "]", output_name, sep = "")
         }
-        
+
         # 12 sectors conversion if required -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
         if (twelve_S == TRUE) {
             rsf_H1_12 <- S36_to_S12_RSF(rsf_H1)
-            
+
             bench_table <- Bensh_RSF(rsf_H1, rsf_H1_12, layout, Gen_power_curve())
-            
+
             Ratio <- bench_table[, mean(ratio12_36)]
-            
+
             write.csv(bench_table,
                       paste("benchmark_table_", output_name, ".csv", sep = ""))
-            
+
             pdf(file = paste("benchmark_graph_", output_name, ".pdf", sep = ""))
             hist(
                 bench_table$ratio12_36,
@@ -124,55 +124,55 @@ RSF_convert <-function(rsf_file1,
             abline(v = mean(bench_table$ratio12_36), lwd = 3)
             rug(bench_table$ratio12_36)
             dev.off()
-            
+
             rsf_H1 <- rsf_H1_12
             rm(rsf_H1_12)
-            
+
             if (rsf2 == TRUE) {
                 rsf_H2_12 <- S36_to_S12_RSF(rsf_H2)
                 rsf_H2 <- rsf_H2_12
                 rm(rsf_H2_12)
             }
-            
+
             output_name <-
                 paste("[12S_",
                       round(Ratio * 100 - 100, 1),
                       "]",
                       output_name,
                       sep = "")
-            
+
         }
-        
-        
+
+
         # Shear table -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
         if (shear_out == TRUE) {
             shear_table_file_name <- paste("[shear_table]", output_name, ".csv", sep = "")
             shear_table <- Shear_RSF(rsf_H2, rsf_H1)
             ShearTable(shear_table, shear_table_file_name)  #create shear file
         }
-        
-        
+
+
         # 3D rsf -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
         if (three_D == TRUE) {
             # creation of the vector containing the different calculation heights
             H1 <- unique(rsf_H1[, Height])
             H2 <- unique(rsf_H2[, Height])
-            
+
             if (is.null(layer_H)) {     #if layer_H is not define, create a layer every 10 meters
                 layer_H <- seq(0, 200, 10)
                 layer_H <- layer_H[layer_H > min(H1, H2) & layer_H < max(H1, H2)]
             }
-            
+
             # creation of the 3 dimensionals rsf
             rsf_H1 <- Interpol_RSF(rsf_H1, rsf_H2, layer_H)
             output_name <- paste("[3D]", output_name, sep = "")
         }
-        
-        
+
+
         # Write to file -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-        
+
         Write_RSF(rsf_H1 , output_name)
-        
+
     }
 
 
@@ -188,25 +188,25 @@ RSF_convert <-function(rsf_file1,
 #' rsf_166 <- Read_RSF("RSF-windresource-CFD_Aldermyrberget 166m.rsf")
 Read_RSF <- function(Input_file) {
     ## function read an *.rsf file. it reconises if it is 36 or 12 sectors, load it accordingly, with columns names
-    
+
     library("readr")              ## use for the read_fwf function much more faster than read.fwf
     library("data.table")         ## use forthe output format
-    
+
     con <- file(Input_file, "r")
     line <-
         readLines(con, 1)      ## sample line to check if it is a 36 sectors or 12 sectors file
     close(con)
-    
+
     if (nchar(line) > 400) {
         ## it means it should be a 36 sectors (actually 36S should be exactly 540)
-        RSF_Col_Format <- c(10, 10, 10, 8, 5, 6, 5, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 
+        RSF_Col_Format <- c(10, 10, 10, 8, 5, 6, 5, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
                             4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5)
-            
-        
+
+
         ## creation of colomn name vector
         RSF_Col_Name <- c("Label",
                           "X",
@@ -218,15 +218,15 @@ Read_RSF <- function(Input_file) {
                           "Blank",
                           "Sector")
         RSF_Col_Name <- c(RSF_Col_Name, paste(c("F36_", "A36_", "k36_"), rep(seq(0, 350, 10), each = 3), sep = ""))
-        
-        
-        
+
+
+
     } else{
         ##if less than 400, then it means it should be a 12 sectors (actually 12S should be exactly 228)
-        RSF_Col_Format <- c(10, 10, 10, 8, 5, 6, 5, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 
+        RSF_Col_Format <- c(10, 10, 10, 8, 5, 6, 5, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
                             4, 5, 4, 4, 5)
-        
+
         RSF_Col_Name <-
             c("Label",
               "X",
@@ -240,19 +240,19 @@ Read_RSF <- function(Input_file) {
         RSF_Col_Name <-
             c(RSF_Col_Name, paste(c("F12_", "A12_", "k12_"), rep(seq(0, 330, 30), each = 3), sep = ""))
     }
-    
+
     RSF_table <-
         data.table(read_fwf(
             Input_file,
             fwf_widths(RSF_Col_Format, col_names = RSF_Col_Name)
         ))
-    
+
     if (is.na(RSF_table$Label[1])) {RSF_table$Label <- "RRR"} # to avoid issue in other functions
-    
+
     RSF_table <- RSF_table[order(RSF_table[, Y], RSF_table[, X])]   #Order the file: Y and X. Windpro is not always coherent when creating an rsf file from WasP.
-    
+
     RSF_table
-    
+
 }
 
 #' Crop_RSF Function
@@ -270,9 +270,9 @@ Read_RSF <- function(Input_file) {
 #' rsf_166 <- Read_RSF("RSF-windresource-CFD_Aldermyrberget 166m.rsf")
 Crop_RSF <- function(rsf, Xmax, Xmin, Ymax, Ymin) {
         # (A,B,C,D, could be read as "Xmax, Xmin, Ymax, Ymin", or just "Layout_Table, Buffer in [m]")
-        
+
         library("data.table")
-        
+
         if (!is(rsf, "data.table")) {
             stop("the Object pass in Crop_RSF is not a data.table")
         } else{
@@ -293,97 +293,97 @@ S36_to_S12_RSF <- function(RSF36) {
     # Combine the neighbouring sectors 3 by 3 to end-up with a 12 sectors RSF.
     # For the moment, it uses columns names as reference: beter for understanding, but this mean that the input RSF should have the corrects columns names
     # Could maybe be change by using columns numbers & and using a loop on the 12 sectors (it would be less easy to understand)
-    
+
     if (length(RSF36) != 117) {
         stop("The object passed in S36_to_S12_RSF function is not a 36 Sector RSF (lenght of RSF36 should be 117)")
     } else if (!is(RSF36, "data.table")) {
         stop("the Object pass in S36_to_S12_RSF function is not a data.table")
     }
-    
-    
+
+
     ## creating the RSF 12 sector
     RSF12 <- data.table(RSF36)
-    
-    
+
+
     ## Create new columns with 12 sectors values (Frequency, Average Wind Speed, k)
     RSF12[, F12_0 := F36_350 + F36_0 + F36_10]
     RSF12[, A12_0 := round((A36_350 * F36_350 + A36_0 * F36_0 + A36_10 * F36_10) /
                                F12_0, 0)]
     RSF12[, k12_0 := round((k36_350 * F36_350 + k36_0 * F36_0 + k36_10 * F36_10) /
                                F12_0, 0)]
-    
+
     RSF12[, F12_30 := F36_20 + F36_30 + F36_40]
     RSF12[, A12_30 := round((A36_20 * F36_20 + A36_30 * F36_30 + A36_40 *
                                  F36_40) / F12_30, 0)]
     RSF12[, k12_30 := round((k36_20 * F36_20 + k36_30 * F36_30 + k36_40 *
                                  F36_40) / F12_30, 0)]
-    
+
     RSF12[, F12_60 := F36_50 + F36_60 + F36_70]
     RSF12[, A12_60 := round((A36_50 * F36_50 + A36_60 * F36_60 + A36_70 *
                                  F36_70) / F12_60, 0)]
     RSF12[, k12_60 := round((k36_50 * F36_50 + k36_60 * F36_60 + k36_70 *
                                  F36_70) / F12_60, 0)]
-    
+
     RSF12[, F12_90 := F36_80 + F36_90 + F36_100]
     RSF12[, A12_90 := round((A36_80 * F36_80 + A36_90 * F36_90 + A36_100 *
                                  F36_100) / F12_90, 0)]
     RSF12[, k12_90 := round((k36_80 * F36_80 + k36_90 * F36_90 + k36_100 *
                                  F36_100) / F12_90, 0)]
-    
+
     RSF12[, F12_120 := F36_110 + F36_120 + F36_130]
     RSF12[, A12_120 := round((A36_110 * F36_110 + A36_120 * F36_120 + A36_130 *
                                   F36_130) / F12_120,0)]
     RSF12[, k12_120 := round((k36_110 * F36_110 + k36_120 * F36_120 + k36_130 *
                                   F36_130) / F12_120,0)]
-    
+
     RSF12[, F12_150 := F36_140 + F36_150 + F36_160]
     RSF12[, A12_150 := round((A36_140 * F36_140 + A36_150 * F36_150 + A36_160 *
                                   F36_160) / F12_150,0)]
     RSF12[, k12_150 := round((k36_140 * F36_140 + k36_150 * F36_150 + k36_160 *
                                   F36_160) / F12_150,0)]
-    
+
     RSF12[, F12_180 := F36_170 + F36_180 + F36_190]
     RSF12[, A12_180 := round((A36_170 * F36_170 + A36_180 * F36_180 + A36_190 *
                                   F36_190) / F12_180,0)]
     RSF12[, k12_180 := round((k36_170 * F36_170 + k36_180 * F36_180 + k36_190 *
                                   F36_190) / F12_180,0)]
-    
+
     RSF12[, F12_210 := F36_200 + F36_210 + F36_220]
     RSF12[, A12_210 := round((A36_200 * F36_200 + A36_210 * F36_210 + A36_220 *
                                   F36_220) / F12_210,0)]
     RSF12[, k12_210 := round((k36_200 * F36_200 + k36_210 * F36_210 + k36_220 *
                                   F36_220) / F12_210,0)]
-    
+
     RSF12[, F12_240 := F36_230 + F36_240 + F36_250]
     RSF12[, A12_240 := round((A36_230 * F36_230 + A36_240 * F36_240 + A36_250 *
                                   F36_250) / F12_240,0)]
     RSF12[, k12_240 := round((k36_230 * F36_230 + k36_240 * F36_240 + k36_250 *
                                   F36_250) / F12_240,0)]
-    
+
     RSF12[, F12_270 := F36_260 + F36_270 + F36_280]
     RSF12[, A12_270 := round((A36_260 * F36_260 + A36_270 * F36_270 + A36_280 *
                                   F36_280) / F12_270,0)]
     RSF12[, k12_270 := round((k36_260 * F36_260 + k36_270 * F36_270 + k36_280 *
                                   F36_280) / F12_270,0)]
-    
+
     RSF12[, F12_300 := F36_290 + F36_300 + F36_310]
     RSF12[, A12_300 := round((A36_290 * F36_290 + A36_300 * F36_300 + A36_310 *
                                   F36_310) / F12_300,0)]
     RSF12[, k12_300 := round((k36_290 * F36_290 + k36_300 * F36_300 + k36_310 *
                                   F36_310) / F12_300,0)]
-    
+
     RSF12[, F12_330 := F36_320 + F36_330 + F36_340]
     RSF12[, A12_330 := round((A36_320 * F36_320 + A36_330 * F36_330 + A36_340 *
                                   F36_340) / F12_330,0)]
     RSF12[, k12_330 := round((k36_320 * F36_320 + k36_330 * F36_330 + k36_340 *
                                   F36_340) / F12_330,0)]
-    
+
     RSF12[, Sector := 12]
-    
-    
+
+
     #remove the 36 sectors columns
     RSF12[, paste(c("F36_", "A36_", "k36_"), rep(seq(0, 350, 10), each = 3), sep = "") := NULL]
-    
+
 }
 
 #' Write_RSF Function
@@ -398,12 +398,12 @@ S36_to_S12_RSF <- function(RSF36) {
 #' Write_RSF(rsf80, "rsf_80m_Aldermyberget.rsf")
 Write_RSF <- function(RSF, output_file_name) {
     # write an rsf table ("RSF") in memory to a *.rsf file ("output_file_name")
-    
+
     library("gdata") ## use for the write.fwf function (write.fwf writes object in *f*ixed *w*idth *f*ormat )
-    
+
     Num_Sectors <- RSF[, unique(Sector)]
     RSF_Col_Format <- c(c(10, 10, 10, 8, 5, 5, 6, 15, 3), rep(c(4, 4, 5), Num_Sectors))
-    
+
     # write the results of the 12 sectors RSF in a file (Fixe Wild File)
     write.fwf(
         RSF,
@@ -413,7 +413,7 @@ Write_RSF <- function(RSF, output_file_name) {
         sep = "",
         na = "40"
     )    #na need a value (other wise windpro will trow an error)
-    
+
 }
 
 #' Shear Function
@@ -428,42 +428,42 @@ Write_RSF <- function(RSF, output_file_name) {
 #' rsf_shear <- Shear_RSF(rsf87,rsf137)
 Shear_RSF <- function(rsf_H1, rsf_H2) {
     #creation of a "Shear" RSF, that can be visualised with windPro (need column manipulation and correcttion factor to revert back the A --> Vave correction)
-    
+
     H1 <- unique(rsf_H1[, Height])
     H2 <- unique(rsf_H2[, Height])
     N_Sector <- unique(rsf_H2[, Sector])
-    
+
     if (N_Sector == 12) {
         sector_size = 30
     } else if (N_Sector == 36) {
         sector_size = 10
     }
-    
+
     Shear <-
         rsf_H1[, .(Label, X, Y, Z, Height, Aave, k, Blank, Sector)]  #  initialization shear <= first columns of the rsf
-    
+
     Shear[, ':=' (
         Height = 999,
         Aave = log(rsf_H1[, Aave] / rsf_H2[, Aave]) / log(H1 / H2),
         Sector = 0 )] #change of the All sector (999) part
     Buffer <- Shear[, .(Label, X, Y, Z, Height, Aave, k, Blank, Sector)]
-    
+
     for (i in 1:N_Sector) {
         # fil sectorwise wind shear
-        
+
         j <-
             i * 3 + 7 # column number in the rsf data.tables for the concerned sector
-        
+
         Buffer[, "Aave" := (log(rsf_H1[, j + 1, with = FALSE] / rsf_H2[, j + 1, with = FALSE]) / log(H1 / H2)), with = FALSE]  # note that here because of the With = FALSE columns name has to be passed as a Charactere string : with " "
         Buffer[, Height := (i - 1) * sector_size]
         Shear <- rbind(Shear, Buffer)
-        
+
     }
-    
+
     #Shear[,k:=2]                                   #  set k to constant = 2 (rsf "Hack")
     #correction_Factor = 1/gamma(1+1/2)
     #Shear[,Aave:=round(Aave*correction_Factor,2)]  #  reverse function from Aave to Vave ...but with "shear values" as Vave (rsf "Hack")
-    
+
     names(Shear)[names(Shear) == "Aave"] <- "ShearAve"
     names(Shear)[names(Shear) == "Height"] <- "Direction"
     Shear <- Shear[complete.cases(Shear)]
@@ -484,9 +484,9 @@ Shear_RSF <- function(rsf_H1, rsf_H2) {
 #' AEP_T1 <- Prod_RSF(rsf87,3756122,1625482,pc)
 Prod_RSF <- function(rsf, Xp, Yp, power_curve) {
     ## compute the production [MWh] for one turbine type(power curve) on one position.
-    
+
     library(data.table)
-    
+
     if (!is(rsf, "data.table")) {
         stop("the rsf Object pass in Prod_RSF function is not a data.table")
     } else if (Xp < rsf[, min(X)] |
@@ -497,29 +497,29 @@ Prod_RSF <- function(rsf, Xp, Yp, power_curve) {
     } else if (sum(dim(power_curve) == c(81, 2)) != 2) {
         stop("the power_curve Object pass in Prod_RSF function is not in the correct dimension (81x2)")
     }
-    
-    
+
+
     #node <- rsf[abs(X-Xp) < 12.5 & abs(Y-Yp) < 12.5, ]   #closest node to the turbine position (reason of 12.5 ==> rsf resolution = 25m)
     node <- rsf[which.min(abs(X - Xp) + abs(Y - Yp))]     # have to be change the rsf grid is not always constant (25m)
-    
+
     ws_ms <- seq(0, 40, 0.5)
-    
+
     DT <- data.table(matrix(0, 81, (length(rsf) - 9) / 3 + 1))   #intialisation de la data table
-    
+
     DT[, 1 := ws_ms, with = FALSE]
-    
+
     selection <- grep("F", names(node), value = TRUE)
     tot_freq <- sum(node[, selection, with = FALSE])                  # correct the cfd rsf rouding in the frequency sum ( should be equal to 1000....i dont know if it has an impact in Windpro Calc)
-    
+
     #print(tot_freq)
-    
+
     for (i in 1:((length(node) - 9) / 3)) {   #migh be optimized with mapply and grep into coloumn names...but it is a little table
         freq <- as.numeric(node[, 7 + i * 3, with = FALSE]) * 1000 / tot_freq
         aave <- as.numeric(node[, 8 + i * 3, with = FALSE] / 10)
         kave <- as.numeric(node[, 9 + i * 3, with = FALSE] / 100)
         DT[, i + 1 := freq * dweibull(ws_ms, kave, aave) / 2, with = FALSE]  # selection de la colonnes par son numero, on divise par deux car on est en step de 0.5 m/s
     }
-    
+
     DT[, sum := rowSums(.SD), by = V1]
     sum(power_curve[, 2] * DT[, sum]) * 8760 / (1000 * 1000)     # 8760 for hours in a year, /1000 kW => MW,  /1000 freq table is in per 1000.
 }
@@ -549,19 +549,19 @@ Bensh_RSF <- function(rsf36, rsf12, layout, power_curve) {
     } else if (sum(dim(power_curve) == c(81, 2)) != 2) {
         stop("the power_curve Object pass in Bensh_RSF function is not in the correct dimension (81x2)")
     }
-    
+
     names(layout) <- c("X", "Y")
     results <- data.table(layout)
-    
+
     for (i in 1:nrow(layout)) {
         results[i, ':=' (
             AEP_36 = Prod_RSF(rsf36, X, Y, power_curve),
             AEP_12 = Prod_RSF(rsf12, X, Y, power_curve)
         )]
     }
-    
+
     results[, ratio12_36 := AEP_12 / AEP_36]
-    
+
 }
 
 #' Gen_power_curve Function
@@ -678,72 +678,72 @@ Gen_power_curve <- function(turbine = "V117-3.45") {
 #' rsf_3D <- Interpol_RSF(rsf_100, rsf_150,c(87,105,137))
 Interpol_RSF <- function(rsf_H1, rsf_H2, layer_H) {
     # create a rsf file at the heigth(s) provided in the vector "layer_H", based on the interpolation of rsf at H1 and H2. it assumes a shear profile of the wind speed.
-    
+
     # check the coherence of the grids (X,Y) of the two RSF. In order to work with column operations, grids should be exactly similar.
     if (min(rsf_H1[, X] == rsf_H2[, X]) == 0 |
         min(rsf_H1[, Y] == rsf_H2[, Y]) == 0) {
         stop("the two rsf Objects pass in Interpol_RSF function do not have the same meshing/grid")
     }
-    
+
     H1 <- unique(rsf_H1[, Height])
     H2 <- unique(rsf_H2[, Height])
     N_Sector <- unique(rsf_H2[, Sector])
-    
-    
+
+
     #interpol_table is a table with the vertial "gradient of each parameters: Freq (linear), Avae (power law), k (linear)
     interpol_table <- rsf_H1[, .(Label, X, Y, Z, Height, Aave, k, Blank, Sector)]  #initialisation of the fist columns
-    
-    
+
+
     for (i in 1:N_Sector) {  # fill sectorwise gradients
-        
+
         j <- i * 3 + 7 # column number in the rsf data.tables for the concerned sector
-        
+
         # vertical "gradient" for Freq : assumed linear
         interpol_table[, paste("Slope_F", i - 1, sep = "") := (rsf_H1[, j, with = FALSE] - rsf_H2[, j, with = FALSE]) / (H1 - H2), with = FALSE]
-        
+
         # vertical "gradient" for Aave: assumed power law
         interpol_table[, paste("Shear_", i - 1, sep = "") := (log(rsf_H1[, j + 1, with = FALSE] / rsf_H2[, j + 1, with = FALSE]) / log(H1 / H2)), with = FALSE]
-        
+
         # vertical "gradient" for k : assumed linear
         interpol_table[, paste("Slope_k", i - 1, sep = "") := (rsf_H1[, j + 2, with = FALSE] - rsf_H2[, j + 2, with = FALSE]) / (H1 - H2), with = FALSE]
     }
-    
-    
+
+
     interpol_table[, ':=' (
         Aave = log(rsf_H1[, Aave] / rsf_H2[, Aave]) / log(H1 / H2),
         k = (rsf_H1[, k] - rsf_H2[, k]) / (H1 - H2))]   #the overall gradient columns (not sectorwise)
-    
+
     setnames(interpol_table, "Aave", "Shear")
     setnames(interpol_table, "k", "Slope_k")
-    
+
     rsd_3D <- data.table(rsf_H1)
-    
+
     for (H3 in layer_H) {
         # to merge with the code above where layer_H = one height only)
-        
+
         rsf_H3 <- data.table(rsf_H1)
         rsf_H3[, ':='(
             Aave = round(rsf_H1[, Aave] * (H3 / H1) ^ interpol_table[, Shear], 2),
-            k = round(rsf_H1[, k] + interpol_table[, Slope_k] * (H3 - H1), 3), 
+            k = round(rsf_H1[, k] + interpol_table[, Slope_k] * (H3 - H1), 3),
             Height = H3)]
-        
+
         for (i in 1:N_Sector) {
             j <- i * 3 + 7 # column number in the rsf data.tables for the concerned sector
-            
+
             rsf_H3[, j := round(rsf_H1[, j, with = FALSE] + interpol_table[, j, with = FALSE] * (H3 - H1), 0), with = FALSE]          #Freq
             rsf_H3[, j + 1 := round(rsf_H1[, j + 1, with = FALSE] * (H3 / H1) ^ interpol_table[, j + 1, with = FALSE], 0), with = FALSE]     #Aave
             rsf_H3[, j + 2 := round(rsf_H1[, j + 2, with = FALSE] + interpol_table[, j + 2, with = FALSE] * (H3 - H1), 0), with = FALSE]    #k
-            
+
         }
-        
+
         rsf_H3[1, 1] <-"sheared"                   #tag ad to the first line of the RSF to know that it has been interpolate by this function
         rsf_H3 <- rsf_H3[complete.cases(rsf_H3)]   #remove some artefact line (because of neg value or 0 in the input rsf)
         rsd_3D <- rbind(rsd_3D, rsf_H3)
-        
+
     }
-    
+
     rsd_3D <- rbind(rsd_3D, rsf_H2)
-    
+
 }
 
 #' Shear2png Function
@@ -759,30 +759,30 @@ Interpol_RSF <- function(rsf_H1, rsf_H2, layer_H) {
 Shear2png <- function(RSF_shear) {
     #Save the shear RSF to a serie (average and for all sectors) of georefenced images (*.png and *.pgw).
     #for more information about the *.pgw (word file): https://en.wikipedia.org/wiki/World_file)
-    
-    
+
+
     library(ggplot2)
     library(cowplot)   # just for the use a function plot_grid() to remove the white border of the plot
     library(png)       # to insert the legend on the graph (pictures)
-    
+
     mypng <- readPNG('map_legend_shear.png')
-    
+
     #Parameters initialisation for creating the picture ----------------------------------------------
-    
+
     # Parameters for the png
     pxl_size <- abs(unique(RSF_shear$X)[1] - unique(RSF_shear$X)[2])    #pixel size [m]
     img_size_x <- length(unique(RSF_shear$X))   #image size X [pxl]
     img_size_y <- length(unique(RSF_shear$Y))   #image size Y [pxl]
-    
+
     # Parameters for the pgw file *-*-*-*-*-*-*-*-*-
     first_pxl_x <- min(RSF_shear$X)
     first_pxl_y <- max(RSF_shear$Y)
-    
-    
+
+
     # Creation of pictures ----------------------------------------------------------------------------
-    
+
     N_Sector <- as.integer(unique(RSF_shear$Direction))
-    
+
     for (s in N_Sector) {
         png_name <- paste("shear_", s, ".png", sep = "")
         pwg_name <-
@@ -798,9 +798,9 @@ Shear2png <- function(RSF_shear) {
             file = pwg_name,
             sep = ""
         ) #content in pwg is always the same whatever the sector
-        
+
         shear <- subset(RSF_shear, Direction == as.integer(s))
-        
+
         plot <- ggplot(shear, aes(X, Y, z = ShearAve)) +
             geom_raster(aes(fill = ShearAve)) +
             scale_fill_distiller(palette = "Spectral", limits = c(-0.1, 0.8)) +
@@ -816,9 +816,9 @@ Shear2png <- function(RSF_shear) {
                 xmin = first_pxl_x,
                 xmax = first_pxl_x + pxl_size * 46
             )
-        
+
         print(plot_grid(plot, scale = 1.1))   # remove those bloody borders
-        
+
         dev.copy(png,
                  file = png_name,
                  width = img_size_x,
@@ -840,30 +840,30 @@ Shear2png <- function(RSF_shear) {
 Shear2pngV2 <- function(RSF_shear) {
     #Save the shear RSF to a serie (average and for all sectors) of georefenced images (*.png and *.pgw).
     #for more information about the *.pgw (word file): https://en.wikipedia.org/wiki/World_file)
-    
-    
+
+
     library(ggplot2)
     library(cowplot)   # just for the use a function plot_grid() to remove the white border of the plot
     library(png)       # to insert the legend on the graph (pictures)
-    
+
     mypng <- readPNG('map_legend_shear.png')
-    
+
     #Parameters initialisation for creating the picture ----------------------------------------------
-    
+
     # Parameters for the png
     pxl_size <- abs(unique(RSF_shear$X)[1] - unique(RSF_shear$X)[2])    #pixel size [m]
     img_size_x <- length(unique(RSF_shear$X))   #image size X [pxl]
     img_size_y <- length(unique(RSF_shear$Y))   #image size Y [pxl]
-    
+
     # Parameters for the pgw file *-*-*-*-*-*-*-*-*-
     first_pxl_x <- min(RSF_shear$X)
     first_pxl_y <- max(RSF_shear$Y)
-    
-    
+
+
     # Creation of pictures ----------------------------------------------------------------------------
-    
+
     N_Sector <- as.integer(unique(RSF_shear$Direction))
-    
+
     for (s in N_Sector) {
         png_name <- paste("shear_", s, ".png", sep = "")
         pwg_name <-
@@ -879,9 +879,9 @@ Shear2pngV2 <- function(RSF_shear) {
             file = pwg_name,
             sep = ""
         ) #content in pwg is always the same whatever the sector
-        
+
         shear <- subset(RSF_shear, Direction == as.integer(s))
-        
+
         plot <- ggplot(shear, aes(X, Y, z = ShearAve)) +
             geom_raster(aes(fill = ShearAve)) +
             scale_fill_distiller(palette = "Spectral", limits = c(-0.1, 0.8)) +
@@ -897,9 +897,9 @@ Shear2pngV2 <- function(RSF_shear) {
                 xmin = first_pxl_x,
                 xmax = first_pxl_x + pxl_size * 46
             )
-        
+
         print(plot_grid(plot, scale = 1.1))   # remove those bloody borders
-        
+
         dev.copy(png,
                  file = png_name,
                  width = img_size_x,
@@ -923,9 +923,9 @@ ShearTable <- function(RSF_shear, output_name = "sheartable.csv") {
     # Re-format the shear table (result from Shear_RSF) from (x,y,sector) table (3 x n) --> ((x,y) ~ sector) table (2+n_sector x n)
     # write the result in a csv file (can be used afterward to extrapolate to new HH or extract the shear value on some positions)
     # Note for later: should be directly implemented into Shear_RSF (need to change the shear2png function)
-    
+
     library(tidyr)    # use for the spread function
-    
+
     mat <- spread(data = RSF_shear,
                key = Direction,
                value = ShearAve)
@@ -935,7 +935,7 @@ ShearTable <- function(RSF_shear, output_name = "sheartable.csv") {
                file = output_name,
                row.names = FALSE)
     mat
-    
+
 }
 
 #' ShearExtract Function
@@ -955,22 +955,22 @@ ShearExtract <- function(shear_csv, layout_csv, output_name = "shear_VSC_input.s
         # shear_csv: shear file in CSV format (output of "ShearTable" function)
         # layout_csv: layout file in csv format (X,Y)
         # output_name: name of the output file (*.shr)
-        
+
         library(data.table)
-        
+
         shear <- read.csv2(shear_csv)
         shear <- data.table(shear)
         shear <- subset(shear, select = -c(X999))
-        
+
         layout <- read.csv(layout_csv)
         layout <- layout[complete.cases(layout), ]
-        
+
         con <- file(output_name, "w")
         writeLines("Wind Shear deducted by CFD-RSF difference", con = con)
         close(con)
-        
+
         layout_shear <- data.table(NULL)
-        
+
         for (i in 1:nrow(layout)) {
             Xp <- layout[i, 1]
             Yp <- layout[i, 2]
@@ -978,10 +978,10 @@ ShearExtract <- function(shear_csv, layout_csv, output_name = "shear_VSC_input.s
                 shear[which.min(abs(X - Xp) + abs(Y - Yp))]
             layout_shear <- rbind(layout_shear, buffer)
         }
-        
+
         layout_shear[, 1] <- layout[, 1]  # change the X to the exact X of the turbine
         layout_shear[, 2] <- layout[, 2]  # change the Y to the exact Y of the turbine
-        
+
         write.table(
             layout_shear,
             file = output_name,
@@ -989,7 +989,7 @@ ShearExtract <- function(shear_csv, layout_csv, output_name = "shear_VSC_input.s
             row.names = FALSE,
             sep = ";"
         )
-        
+
     }
 
 #' Vizu_RSF Function
@@ -1002,24 +1002,22 @@ ShearExtract <- function(shear_csv, layout_csv, output_name = "shear_VSC_input.s
 #' Vizu_RSF(rsf_87)
 Vizu_RSF <- function(rsf) {
     # dynamic plot(raster map) of rsf variables (A, k, freq, shear).
-    
+
     library(ggplot2)
     library(manipulate)    # for dynamic plot (you choose the variable you want to plot)
-    
-    names_col <-
-        sort(names(rsf))    # creation of the list of variable availabe in the plot
+
+    names_col <- sort(names(rsf))    # creation of the list of variable availabe in the plot
     names_col <- as.list(names_col)
-    picker_list <-
-        names_col[names_col != "Label"]  # remove usless variables for the plot
+    picker_list <- names_col[names_col != "Label"]  # remove usless variables for the plot
     picker_list <- picker_list[picker_list != "X"]
     picker_list <- picker_list[picker_list != "Y"]
     picker_list <- picker_list[picker_list != "Z"]
     picker_list <- picker_list[picker_list != "Height"]
     picker_list <- picker_list[picker_list != "Blank"]
     picker_list <- picker_list[picker_list != "Sector"]
-    
-    p <- gplot(rsf, aes(X, Y))
-    
+
+    p <- ggplot(rsf, aes(X, Y))
+
     manipulate(
         p + geom_raster(aes(fill = subset(rsf, select = variable)[[1]])) +  #[[1]] --> needed because of input format condition of geom_raster
             scale_fill_distiller(palette = "Spectral") +
