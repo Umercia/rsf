@@ -193,8 +193,7 @@ Read_RSF <- function(Input_file) {
     library("data.table")         ## use forthe output format
 
     con <- file(Input_file, "r")
-    line <-
-        readLines(con, 1)      ## sample line to check if it is a 36 sectors or 12 sectors file
+    line <- readLines(con, 1)      ## sample line to check if it is a 36 sectors or 12 sectors file
     close(con)
 
     if (nchar(line) > 400) {
@@ -218,8 +217,6 @@ Read_RSF <- function(Input_file) {
                           "Blank",
                           "Sector")
         RSF_Col_Name <- c(RSF_Col_Name, paste(c("F36_", "A36_", "k36_"), rep(seq(0, 350, 10), each = 3), sep = ""))
-
-
 
     } else{
         ##if less than 400, then it means it should be a 12 sectors (actually 12S should be exactly 228)
@@ -250,6 +247,8 @@ Read_RSF <- function(Input_file) {
     if (is.na(RSF_table$Label[1])) {RSF_table$Label <- "RRR"} # to avoid issue in other functions
 
     RSF_table <- RSF_table[order(RSF_table[, Y], RSF_table[, X])]   #Order the file: Y and X. Windpro is not always coherent when creating an rsf file from WasP.
+
+
 
     RSF_table
 

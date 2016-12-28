@@ -6,7 +6,8 @@ Authors@R: person("Maurice", "Clere", email = "cleremaurice@yahoo.fr",
                   role = c("aut", "cre"))
 Description: *.rsf file manipulation and visualisation (rsf: Wind Ressource map format). Main functionalities: crop, convert 36 Sectors to 12 Sectors, plot (map) of average wind speed, A, k and shear per sectors, expot wind shear table.
 Depends:
-    R (>= 3.2.3)
+    R (>= 3.2.3),
+	data.table
 Imports:
     data.table,
     ggplot2,
