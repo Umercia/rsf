@@ -247,8 +247,6 @@ Read_RSF <- function(Input_file) {
 
     RSF_table <- RSF_table[order(RSF_table[, Y], RSF_table[, X])]   #Order the file: Y and X. Windpro is not always coherent when creating an rsf file from WasP.
 
-
-
     RSF_table
 
 }
