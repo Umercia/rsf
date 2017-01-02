@@ -998,11 +998,14 @@ ShearExtract <- function(shear_csv, layout_csv, output_name = "shear_VSC_input.s
 #' @keywords rsf, plot, vizualisation
 #' @export
 #' @examples
-#' RSF_plot("Aldermyrberget 166m.rsf")
+#' RSF_plot(rsf_file = "Aldermyrberget 166m.rsf", layout_csv = "layout V14A.csv")
 RSF_plot <- function(rsf_file,layout_csv = NULL){
 
     library(ggplot2)
     library(manipulate)
+
+
+# Reading Inputs *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
     rsf <- Read_RSF(rsf_file)
 
@@ -1014,7 +1017,8 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
         names(layout) <- c("X", "Y")
     }
 
-    # unit conversion (k*100, A*10, average wind speed compute)
+
+# unit conversion (k*100, A*10, average wind speed compute) *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
     if(Num_Sectors == 12) {
 
         rsf[, ':=' (k12_000 = k12_000/100,
@@ -1057,8 +1061,6 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
                    V12_300 = A12_300*gamma(1+1/k12_300),
                    V12_330 = A12_330*gamma(1+1/k12_330))]
     }
-
-
 
     if(Num_Sectors == 36) {
 
@@ -1136,7 +1138,6 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
                     A36_340 = A36_340/10,
                     A36_350 = A36_350/10)]
 
-
         rsf[, ':=' (V36_000 = A36_000*gamma(1+1/k36_000),
                     V36_010 = A36_010*gamma(1+1/k36_010),
                     V36_020 = A36_020*gamma(1+1/k36_020),
@@ -1177,6 +1178,8 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
     }
 
 
+# picker list for interactive plot *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
     names_col <- sort(names(rsf))
     picker_list <- names_col[names_col != "Label"]
     picker_list <- picker_list[picker_list != "X"]
@@ -1192,6 +1195,9 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
 
     picker_list <- as.list(picker_list)
     picker_list2 <- as.list(unique(rsf$Height))
+
+
+# Interactive plot using manipulate *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
     manipulate(
         factor= picker(picker_list),
@@ -1252,6 +1258,77 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
                 p + scale_fill_gradientn(colours = terrain.colors(10))
 
             }
+        }
+    )
+}
+
+
+
+
+
+#' Shear_plot Function
+#'
+#' Interactive plot (raster/map) of a shear table file (*.csv) (X,Y,direction versus shear)
+#' @param rsf_file: Input *.rsf file name (name should be surounded by "").
+#' @param layout_csv: Input *.csv file name (name should be surounded by "") containing the WTG positions (X,Y).Default value = NULL. if provided, turbine postions would be plotted on the map.
+#' @keywords shear, plot, vizualisation
+#' @export
+#' @examples
+#' Shear_plot("Aldermyrberget 166m.rsf",layout_csv = "layout V14A.csv")
+Shear_plot <- function(shear_file,layout_csv = NULL){
+
+    library(ggplot2)
+    library(manipulate)
+
+
+# Reading Inputs *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+    shear <- read.csv2(shear_file)
+
+    if (length(shear) == 16) {     #12 sectors format
+        names(shear)[-c(1,2,3)] <- paste(c("Shear_"), c("000","030","060","090","120","150","180","210","240","270","300","330","Ave"), sep = "")
+    }else if (length(shear) == 40) { #36 sectors format
+        names(shear)[-c(1,2,3)] <- paste(c("Shear_"), c("000","010","020","030","040","050","060","070","080","090","100","110","120","130","140","150","160","170","180","190","200","210","220","230","240","250","260","270","280","290","300","310","320","330","340","350","Ave"), sep = "")
+    }
+
+    if (!is.null(layout_csv)) {
+        layout <- read.csv(layout_csv)
+        layout <- layout[complete.cases(layout), ]
+        names(layout) <- c("X", "Y")
+    }
+
+
+# picker list for interactive plot *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+    names_col <- sort(names(shear))
+    picker_list <- names_col[names_col != "X"]
+    picker_list <- picker_list[picker_list != "Y"]
+    picker_list <- picker_list[picker_list != "Shear_Ave"]
+    picker_list <- c("Shear_Ave", picker_list)   # just put Shear_Ave in the first row
+    picker_list <- as.list(picker_list)
+
+
+# Interactive plot using manipulate *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+    manipulate(
+        factor= picker(picker_list),
+
+        if (!is.null(layout_csv)) {
+            ggplot(shear,aes(X,Y, z = Z)) +
+                geom_raster(aes(fill= subset(shear, select = factor)[[1]]))+  #[[1]] --> i guess because of input format condition of geom_raster
+                scale_fill_distiller(palette = "Spectral", limits = c(-0.1, 0.7))+
+                stat_contour(aes(colour = ..level..), binwidth = 10)+
+                geom_point(data = layout, aes(x = X, y = Y, z = NULL), shape = 1, size = 2.5, color = "black") +
+                guides(colour = FALSE)+
+                labs(x = NULL, y = NULL, fill = factor)
+
+        } else {
+            ggplot(shear,aes(X,Y, z = Z)) +
+                geom_raster(aes(fill= subset(shear, select = factor)[[1]]))+  #[[1]] --> i guess because of input format condition of geom_raster
+                scale_fill_gradientn(colours = terrain.colors(10))+
+                stat_contour(aes(colour = ..level..), binwidth = 10)+
+                guides(colour = FALSE)+
+                labs(x = NULL, y = NULL, fill = factor)
         }
     )
 }
