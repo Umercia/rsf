@@ -990,36 +990,269 @@ ShearExtract <- function(shear_csv, layout_csv, output_name = "shear_VSC_input.s
 
     }
 
-#' Vizu_RSF Function
+#' RSF_plot Function
 #'
-#' Interactive plot of a rsf object (direction, Height, parameters...)
-#' @param rsf: first rsf object already loaded into memory (wind mapping)
+#' Interactive plot (raster/map) of an rsf object ( direction versus (Height, A, k, Wind speed) )
+#' @param rsf_file: Input *.rsf file name (name should be surounded by "").
+#' @param layout_csv: Input *.csv file name (name should be surounded by "") containing the WTG positions (X,Y).Default value = NULL. if provided, turbine postions would be plotted on the map.
 #' @keywords rsf, plot, vizualisation
 #' @export
 #' @examples
-#' Vizu_RSF(rsf_87)
-Vizu_RSF <- function(rsf) {
-    # dynamic plot(raster map) of rsf variables (A, k, freq, shear).
+#' RSF_plot("Aldermyrberget 166m.rsf")
+RSF_plot <- function(rsf_file,layout_csv = NULL){
 
     library(ggplot2)
-    library(manipulate)    # for dynamic plot (you choose the variable you want to plot)
+    library(manipulate)
 
-    names_col <- sort(names(rsf))    # creation of the list of variable availabe in the plot
-    names_col <- as.list(names_col)
-    picker_list <- names_col[names_col != "Label"]  # remove usless variables for the plot
+    rsf <- Read_RSF(rsf_file)
+
+    Num_Sectors <- rsf[, unique(Sector)]
+
+    if (!is.null(layout_csv)) {
+        layout <- read.csv(layout_csv)
+        layout <- layout[complete.cases(layout), ]
+        names(layout) <- c("X", "Y")
+    }
+
+    # unit conversion (k*100, A*10, average wind speed compute)
+    if(Num_Sectors == 12) {
+
+        rsf[, ':=' (k12_000 = k12_000/100,
+                    k12_030 = k12_030/100,
+                    k12_060 = k12_060/100,
+                    k12_090 = k12_090/100,
+                    k12_120 = k12_120/100,
+                    k12_150 = k12_150/100,
+                    k12_180 = k12_180/100,
+                    k12_210 = k12_210/100,
+                    k12_240 = k12_240/100,
+                    k12_270 = k12_270/100,
+                    k12_300 = k12_300/100,
+                    k12_330 = k12_330/100)]
+
+        rsf[, ':='(A12_000 = A12_000/10,
+                   A12_030 = A12_030/10,
+                   A12_060 = A12_060/10,
+                   A12_090 = A12_090/10,
+                   A12_120 = A12_120/10,
+                   A12_150 = A12_150/10,
+                   A12_180 = A12_180/10,
+                   A12_210 = A12_210/10,
+                   A12_240 = A12_240/10,
+                   A12_270 = A12_270/10,
+                   A12_300 = A12_300/10,
+                   A12_330 = A12_330/10)]
+
+        rsf[, ':='(Vave = Aave*gamma(1+1/k),
+                   V12_000 = A12_000*gamma(1+1/k12_000),
+                   V12_030 = A12_030*gamma(1+1/k12_030),
+                   V12_060 = A12_060*gamma(1+1/k12_060),
+                   V12_090 = A12_090*gamma(1+1/k12_090),
+                   V12_120 = A12_120*gamma(1+1/k12_120),
+                   V12_150 = A12_150*gamma(1+1/k12_150),
+                   V12_180 = A12_180*gamma(1+1/k12_180),
+                   V12_210 = A12_210*gamma(1+1/k12_210),
+                   V12_240 = A12_240*gamma(1+1/k12_240),
+                   V12_270 = A12_270*gamma(1+1/k12_270),
+                   V12_300 = A12_300*gamma(1+1/k12_300),
+                   V12_330 = A12_330*gamma(1+1/k12_330))]
+    }
+
+
+
+    if(Num_Sectors == 36) {
+
+        rsf[, ':=' (k36_000 = k36_000/100,
+                    k36_010 = k36_010/100,
+                    k36_020 = k36_020/100,
+                    k36_030 = k36_030/100,
+                    k36_040 = k36_040/100,
+                    k36_050 = k36_050/100,
+                    k36_060 = k36_060/100,
+                    k36_070 = k36_070/100,
+                    k36_080 = k36_080/100,
+                    k36_090 = k36_090/100,
+                    k36_100 = k36_100/100,
+                    k36_110 = k36_110/100,
+                    k36_120 = k36_120/100,
+                    k36_130 = k36_130/100,
+                    k36_140 = k36_140/100,
+                    k36_150 = k36_150/100,
+                    k36_160 = k36_160/100,
+                    k36_170 = k36_170/100,
+                    k36_180 = k36_180/100,
+                    k36_190 = k36_190/100,
+                    k36_200 = k36_200/100,
+                    k36_210 = k36_210/100,
+                    k36_220 = k36_220/100,
+                    k36_230 = k36_230/100,
+                    k36_240 = k36_240/100,
+                    k36_250 = k36_250/100,
+                    k36_260 = k36_260/100,
+                    k36_270 = k36_270/100,
+                    k36_280 = k36_280/100,
+                    k36_290 = k36_290/100,
+                    k36_300 = k36_300/100,
+                    k36_310 = k36_310/100,
+                    k36_320 = k36_320/100,
+                    k36_330 = k36_330/100,
+                    k36_340 = k36_340/100,
+                    k36_350 = k36_350/100)]
+
+        rsf[, ':=' (A36_000 = A36_000/10,
+                    A36_010 = A36_010/10,
+                    A36_020 = A36_020/10,
+                    A36_030 = A36_030/10,
+                    A36_040 = A36_040/10,
+                    A36_050 = A36_050/10,
+                    A36_060 = A36_060/10,
+                    A36_070 = A36_070/10,
+                    A36_080 = A36_080/10,
+                    A36_090 = A36_090/10,
+                    A36_100 = A36_100/10,
+                    A36_110 = A36_110/10,
+                    A36_120 = A36_120/10,
+                    A36_130 = A36_130/10,
+                    A36_140 = A36_140/10,
+                    A36_150 = A36_150/10,
+                    A36_160 = A36_160/10,
+                    A36_170 = A36_170/10,
+                    A36_180 = A36_180/10,
+                    A36_190 = A36_190/10,
+                    A36_200 = A36_200/10,
+                    A36_210 = A36_210/10,
+                    A36_220 = A36_220/10,
+                    A36_230 = A36_230/10,
+                    A36_240 = A36_240/10,
+                    A36_250 = A36_250/10,
+                    A36_260 = A36_260/10,
+                    A36_270 = A36_270/10,
+                    A36_280 = A36_280/10,
+                    A36_290 = A36_290/10,
+                    A36_300 = A36_300/10,
+                    A36_310 = A36_310/10,
+                    A36_320 = A36_320/10,
+                    A36_330 = A36_330/10,
+                    A36_340 = A36_340/10,
+                    A36_350 = A36_350/10)]
+
+
+        rsf[, ':=' (V36_000 = A36_000*gamma(1+1/k36_000),
+                    V36_010 = A36_010*gamma(1+1/k36_010),
+                    V36_020 = A36_020*gamma(1+1/k36_020),
+                    V36_030 = A36_030*gamma(1+1/k36_030),
+                    V36_040 = A36_040*gamma(1+1/k36_040),
+                    V36_050 = A36_050*gamma(1+1/k36_050),
+                    V36_060 = A36_060*gamma(1+1/k36_060),
+                    V36_070 = A36_070*gamma(1+1/k36_070),
+                    V36_080 = A36_080*gamma(1+1/k36_080),
+                    V36_090 = A36_090*gamma(1+1/k36_090),
+                    V36_100 = A36_100*gamma(1+1/k36_100),
+                    V36_110 = A36_110*gamma(1+1/k36_110),
+                    V36_120 = A36_120*gamma(1+1/k36_120),
+                    V36_130 = A36_130*gamma(1+1/k36_130),
+                    V36_140 = A36_140*gamma(1+1/k36_140),
+                    V36_150 = A36_150*gamma(1+1/k36_150),
+                    V36_160 = A36_160*gamma(1+1/k36_160),
+                    V36_170 = A36_170*gamma(1+1/k36_170),
+                    V36_180 = A36_180*gamma(1+1/k36_180),
+                    V36_190 = A36_190*gamma(1+1/k36_190),
+                    V36_200 = A36_200*gamma(1+1/k36_200),
+                    V36_210 = A36_210*gamma(1+1/k36_210),
+                    V36_220 = A36_220*gamma(1+1/k36_220),
+                    V36_230 = A36_230*gamma(1+1/k36_230),
+                    V36_240 = A36_240*gamma(1+1/k36_240),
+                    V36_250 = A36_250*gamma(1+1/k36_250),
+                    V36_260 = A36_260*gamma(1+1/k36_260),
+                    V36_270 = A36_270*gamma(1+1/k36_270),
+                    V36_280 = A36_280*gamma(1+1/k36_280),
+                    V36_290 = A36_290*gamma(1+1/k36_290),
+                    V36_300 = A36_300*gamma(1+1/k36_300),
+                    V36_310 = A36_310*gamma(1+1/k36_310),
+                    V36_320 = A36_320*gamma(1+1/k36_320),
+                    V36_330 = A36_330*gamma(1+1/k36_330),
+                    V36_340 = A36_340*gamma(1+1/k36_340),
+                    V36_350 = A36_350*gamma(1+1/k36_350),
+                    Vave = Aave*gamma(1+1/k))]
+    }
+
+
+    names_col <- sort(names(rsf))
+    picker_list <- names_col[names_col != "Label"]
     picker_list <- picker_list[picker_list != "X"]
     picker_list <- picker_list[picker_list != "Y"]
-    picker_list <- picker_list[picker_list != "Z"]
+    #picker_list <- picker_list[picker_list != "Z"]
     picker_list <- picker_list[picker_list != "Height"]
     picker_list <- picker_list[picker_list != "Blank"]
     picker_list <- picker_list[picker_list != "Sector"]
+    picker_list <- picker_list[picker_list != "Vave"]
+    picker_list <- picker_list[picker_list != "Aave"]
+    picker_list <- picker_list[picker_list != "k"]
+    picker_list <- c("Vave","Aave","k", picker_list)
 
-    p <- ggplot(rsf, aes(X, Y))
+    picker_list <- as.list(picker_list)
+    picker_list2 <- as.list(unique(rsf$Height))
 
     manipulate(
-        p + geom_raster(aes(fill = subset(rsf, select = variable)[[1]])) +  #[[1]] --> needed because of input format condition of geom_raster
-            scale_fill_distiller(palette = "Spectral") +
-            labs(x = NULL, y = NULL),
-        variable = picker(picker_list)
+        factor= picker(picker_list),
+        level = picker(picker_list2),
+
+        if (!is.null(layout_csv)) {
+
+            p <- ggplot(subset(rsf, Height == level),aes(X,Y, z = Z)) +
+                geom_raster(aes(fill= subset(rsf,Height == level, select = factor)[[1]]))+  #[[1]] --> i guess because of input format condition of geom_raster
+                stat_contour(aes(colour = ..level..), binwidth = 10) +
+                geom_point(data = layout, aes(x = X, y = Y, z = NULL), shape = 1, size = 2.5, color = "black")+
+                guides(colour = FALSE)+
+                labs(x = NULL, y = NULL, fill = factor)
+
+
+            if(substr(factor,1,1) == "V") {   #fix scale for comparaison, limits depend on the parameters.
+
+                p + scale_fill_distiller(palette = "Spectral", limits = c(5.5, 10.5))
+
+            }else if (substr(factor,1,1) == "k") {
+
+                p + scale_fill_distiller(palette = "PRGn", limits = c(1, 4))
+
+            }else if (substr(factor,1,1) == "A") {
+
+                p + scale_fill_distiller(palette = "RdYlBu", limits = c(5.5, 12))
+
+            } else {
+
+                p + scale_fill_gradientn(colours = terrain.colors(10))
+                # scale_fill_distiller(palette = palette(terrain.colors(12)))
+            }
+
+        } else {
+
+            p <- ggplot(subset(rsf, Height == level),aes(X,Y, z = Z)) +
+                stat_contour(aes(colour = ..level..), binwidth = 10) +
+                geom_raster(aes(fill= subset(rsf,Height == level, select = factor)[[1]]))+  #[[1]] --> i guess because of input format condition of geom_raster
+                # geom_point(data = layout, aes(x = X, y = Y, z = NULL), shape = 1, size = 2.5, color = "black")+ #removed if no layout input
+                guides(colour = FALSE)+
+                labs(x = NULL, y = NULL, fill = factor)
+
+
+            if(substr(factor,1,1) == "V") {   #fix scale for comparaison, limits depend on the parameters.
+
+                p + scale_fill_distiller(palette = "Spectral", limits = c(5.5, 10.5))
+
+            }else if (substr(factor,1,1) == "k") {
+
+                p + scale_fill_distiller(palette = "PRGn", limits = c(1, 4))
+
+            }else if (substr(factor,1,1) == "A") {
+
+                p + scale_fill_distiller(palette = "RdYlBu", limits = c(5.5, 12))
+
+            } else {
+
+                p + scale_fill_gradientn(colours = terrain.colors(10))
+
+            }
+        }
     )
 }
+
