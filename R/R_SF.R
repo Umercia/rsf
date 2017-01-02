@@ -304,7 +304,7 @@ S36_to_S12_RSF <- function(RSF36) {
 
 
     ## Create new columns with 12 sectors values (Frequency, Average Wind Speed, k)
-    RSF12[, F12_000 := F36_350 + F36_000 + F36_10]
+    RSF12[, F12_000 := F36_350 + F36_000 + F36_010]
     RSF12[, A12_000 := round((A36_350 * F36_350 + A36_000 * F36_000 + A36_010 * F36_010) /
                                F12_000, 0)]
     RSF12[, k12_000 := round((k36_350 * F36_350 + k36_000 * F36_000 + k36_010 * F36_010) /
@@ -927,7 +927,7 @@ ShearTable <- function(RSF_shear, output_name = "sheartable.csv") {
     mat <- spread(data = RSF_shear,
                key = Direction,
                value = ShearAve)
-    mat <- subset(mat, select = -c(Label, Z, k, Blank, Sector))            #remove unnecessary columns
+    mat <- subset(mat, select = -c(Label, k, Blank, Sector))            #remove unnecessary columns
     mat <- round(x = mat, digits = 2)
     write.csv2(x = mat,
                file = output_name,
