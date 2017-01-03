@@ -1211,21 +1211,30 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
                 labs(x = NULL, y = NULL, fill = factor)
 
 
-            if(substr(factor,1,1) == "V") {   #fix scale for comparaison, limits depend on the parameters.
+            if(substr(factor,1,4) == "Vave") {   #fix scale for comparaison, limits depend on the parameters.
 
                 p + scale_fill_distiller(palette = "Spectral", limits = c(5.5, 10.5))
+                print("Processing. Please wait.")
+
+            }else if (substr(factor,1,1) == "V") {
+
+                p + scale_fill_distiller(palette = "Spectral")
+                print("Processing. Please wait.")
 
             }else if (substr(factor,1,1) == "k") {
 
-                p + scale_fill_distiller(palette = "PRGn", limits = c(1, 4))
+                p + scale_fill_distiller(palette = "PRGn")
+                print("Processing. Please wait.")
 
             }else if (substr(factor,1,1) == "A") {
 
-                p + scale_fill_distiller(palette = "RdYlBu", limits = c(5.5, 12))
+                p + scale_fill_distiller(palette = "RdYlBu")
+                print("Processing. Please wait.")
 
             } else {
 
                 p + scale_fill_gradientn(colours = terrain.colors(10))
+                print("Processing. Please wait.")
                 # scale_fill_distiller(palette = palette(terrain.colors(12)))
             }
 
@@ -1239,21 +1248,30 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
                 labs(x = NULL, y = NULL, fill = factor)
 
 
-            if(substr(factor,1,1) == "V") {   #fix scale for comparaison, limits depend on the parameters.
+            if(substr(factor,1,4) == "Vave") {   #fix scale for comparaison, limits depend on the parameters.
 
                 p + scale_fill_distiller(palette = "Spectral", limits = c(5.5, 10.5))
+                print("Processing. Please wait.")
+
+            }else if (substr(factor,1,1) == "V") {
+
+                p + scale_fill_distiller(palette = "Spectral")
+                print("Processing. Please wait.")
 
             }else if (substr(factor,1,1) == "k") {
 
-                p + scale_fill_distiller(palette = "PRGn", limits = c(1, 4))
+                p + scale_fill_distiller(palette = "PRGn")
+                print("Processing. Please wait.")
 
             }else if (substr(factor,1,1) == "A") {
 
-                p + scale_fill_distiller(palette = "RdYlBu", limits = c(5.5, 12))
+                p + scale_fill_distiller(palette = "RdYlBu")
+                print("Processing. Please wait.")
 
             } else {
 
                 p + scale_fill_gradientn(colours = terrain.colors(10))
+                print("Processing. Please wait.")
 
             }
         }
@@ -1319,6 +1337,7 @@ Shear_plot <- function(shear_file,layout_csv = NULL){
                 geom_point(data = layout, aes(x = X, y = Y, z = NULL), shape = 1, size = 2.5, color = "black") +
                 guides(colour = FALSE)+
                 labs(x = NULL, y = NULL, fill = factor)
+            print("Processing. Please wait.")
 
         } else {
             ggplot(shear,aes(X,Y, z = Z)) +
@@ -1327,6 +1346,7 @@ Shear_plot <- function(shear_file,layout_csv = NULL){
                 stat_contour(aes(colour = ..level..), binwidth = 10)+
                 guides(colour = FALSE)+
                 labs(x = NULL, y = NULL, fill = factor)
+            print("Processing. Please wait.")
         }
     )
 }
