@@ -1213,36 +1213,36 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
 
             if(substr(factor,1,4) == "Vave") {   #fix scale for comparaison, limits depend on the parameters.
 
-                p + scale_fill_distiller(palette = "Spectral", limits = c(5.5, 10.5))
                 print("Processing. Please wait.")
+                p + scale_fill_distiller(palette = "Spectral", limits = c(5.5, 10.5))
 
             }else if (substr(factor,1,1) == "V") {
 
-                p + scale_fill_distiller(palette = "Spectral")
                 print("Processing. Please wait.")
+                p + scale_fill_distiller(palette = "Spectral")
 
             }else if (substr(factor,1,1) == "k") {
 
-                p + scale_fill_distiller(palette = "PRGn")
                 print("Processing. Please wait.")
+                p + scale_fill_distiller(palette = "PRGn")
 
             }else if (substr(factor,1,1) == "A") {
 
-                p + scale_fill_distiller(palette = "RdYlBu")
                 print("Processing. Please wait.")
+                p + scale_fill_distiller(palette = "RdYlBu")
 
             } else {
 
-                p + scale_fill_gradientn(colours = terrain.colors(10))
                 print("Processing. Please wait.")
+                p + scale_fill_gradientn(colours = terrain.colors(10))
                 # scale_fill_distiller(palette = palette(terrain.colors(12)))
             }
 
         } else {
 
             p <- ggplot(subset(rsf, Height == level),aes(X,Y, z = Z)) +
-                stat_contour(aes(colour = ..level..), binwidth = 10) +
                 geom_raster(aes(fill= subset(rsf,Height == level, select = factor)[[1]]))+  #[[1]] --> i guess because of input format condition of geom_raster
+                stat_contour(aes(colour = ..level..), binwidth = 10) +
                 # geom_point(data = layout, aes(x = X, y = Y, z = NULL), shape = 1, size = 2.5, color = "black")+ #removed if no layout input
                 guides(colour = FALSE)+
                 labs(x = NULL, y = NULL, fill = factor)
@@ -1250,28 +1250,29 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
 
             if(substr(factor,1,4) == "Vave") {   #fix scale for comparaison, limits depend on the parameters.
 
-                p + scale_fill_distiller(palette = "Spectral", limits = c(5.5, 10.5))
                 print("Processing. Please wait.")
+                p + scale_fill_distiller(palette = "Spectral", limits = c(5.5, 10.5))
 
             }else if (substr(factor,1,1) == "V") {
 
-                p + scale_fill_distiller(palette = "Spectral")
                 print("Processing. Please wait.")
+                p + scale_fill_distiller(palette = "Spectral")
 
             }else if (substr(factor,1,1) == "k") {
 
-                p + scale_fill_distiller(palette = "PRGn")
                 print("Processing. Please wait.")
+                p + scale_fill_distiller(palette = "PRGn")
 
             }else if (substr(factor,1,1) == "A") {
 
-                p + scale_fill_distiller(palette = "RdYlBu")
                 print("Processing. Please wait.")
+                p + scale_fill_distiller(palette = "RdYlBu")
 
             } else {
 
-                p + scale_fill_gradientn(colours = terrain.colors(10))
                 print("Processing. Please wait.")
+                p + scale_fill_gradientn(colours = terrain.colors(10))
+
 
             }
         }
@@ -1330,6 +1331,7 @@ Shear_plot <- function(shear_file,layout_csv = NULL){
         factor= picker(picker_list),
 
         if (!is.null(layout_csv)) {
+            print("Processing. Please wait.")
             ggplot(shear,aes(X,Y, z = Z)) +
                 geom_raster(aes(fill= subset(shear, select = factor)[[1]]))+  #[[1]] --> i guess because of input format condition of geom_raster
                 scale_fill_distiller(palette = "Spectral", limits = c(-0.1, 0.7))+
@@ -1337,16 +1339,17 @@ Shear_plot <- function(shear_file,layout_csv = NULL){
                 geom_point(data = layout, aes(x = X, y = Y, z = NULL), shape = 1, size = 2.5, color = "black") +
                 guides(colour = FALSE)+
                 labs(x = NULL, y = NULL, fill = factor)
-            print("Processing. Please wait.")
+
 
         } else {
+            print("Processing. Please wait.")
             ggplot(shear,aes(X,Y, z = Z)) +
                 geom_raster(aes(fill= subset(shear, select = factor)[[1]]))+  #[[1]] --> i guess because of input format condition of geom_raster
-                scale_fill_gradientn(colours = terrain.colors(10))+
+                scale_fill_distiller(palette = "Spectral", limits = c(-0.1, 0.7))+
                 stat_contour(aes(colour = ..level..), binwidth = 10)+
                 guides(colour = FALSE)+
                 labs(x = NULL, y = NULL, fill = factor)
-            print("Processing. Please wait.")
+
         }
     )
 }
