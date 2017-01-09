@@ -1,7 +1,7 @@
 
 ## rsf
 
-`rsf` is a package that provides function to make some basic manipulation on wind ressource file (*.rsf). It also provides some plot function to visualise inputs and outputs.
+`rsf` package provides functions to make some basic manipulation on wind ressource file (*.rsf) and some plot functions to visualise inputs and outputs.
 
 ## Install from Github using R:
 
@@ -19,17 +19,17 @@ library("rsf")
 ## Usage examples
 ```r
 library(rsf)
-# Convert one rsf file
+# Transform one rsf file
 RSF_convert(rsf_file1 = "RSF-windresource-CFD_Hennoid [80m].rsf",  # rsf file name at H1=80m (*rsf)
             crop = TRUE,    # ask to crop the map around the wind farm (default value = 700 m around)
             layout_csv = "layout V2 Hennoid.csv",   # input file name for turbine positions (X,Y) (*csv)
             twelve_S = TRUE, # ask to convert the map from 36 sector rsf into 12
             output_name = "Hennoid") # set the output file root name
  
-# the results would be exported into "[12S_0.1][crop_700]Hennoid.rsf" file 
+# In this example, the results would be exported into "[12S_0.1][crop_700]Hennoid.rsf" file 
 
 
-# Creat a 3 dimensional rsf based on two rsf files.
+# Create a 3 dimensional rsf based on two rsf files.
 RSF_convert(rsf_file1 = "RSF-windresource-CFD_Hennoid [80m].rsf",  # first rsf file name at H1=80m (*.rsf)
             rsf_file2 = "RSF-windresource-CFD_Hennoid_[117].rsf",   # second rsf file name at H2=117m *.rsf)
             crop = TRUE,    # ask to crop the map around the wind farm (default value = 700 m around)
@@ -39,7 +39,7 @@ RSF_convert(rsf_file1 = "RSF-windresource-CFD_Hennoid [80m].rsf",  # first rsf f
             layer_H = c(94,105,112),    # add levels for the 3 dimensional rsf
             output_name = "Hennoid") # set the output file root name
             
-# the results would be exported into "[3D][crop_700]Hennoid.rsf" and "[shear_table][crop_700]Hennoid.csv"
+# In this example, the results would be exported into "[3D][crop_700]Hennoid.rsf" and "[shear_table][crop_700]Hennoid.csv"
 
 
 #Visualisation of the new 3 dimensional rsf file (*.rsf)
