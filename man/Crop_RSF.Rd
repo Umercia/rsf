@@ -7,11 +7,11 @@
 Crop_RSF(rsf, Xmax, Xmin, Ymax, Ymin)
 }
 \arguments{
-\item{rsf:}{"*.rsf" file ()}
+\item{rsf:}{rsf object already loaded into memory}
 
 \item{Xmax:}{X maximum limit}
 
-\item{Xmax:}{X minimum limit}
+\item{Xmin:}{X minimum limit}
 
 \item{Ymax:}{Y maximum limit}
 

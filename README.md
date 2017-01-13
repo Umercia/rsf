@@ -65,7 +65,7 @@ Shear_plot(rsf_file1 = "[shear_table][crop_700]Hennoid.csv",
 Function list
 -----------------
 
-The list of all the available function can be find [here](https://github.com/Umercia/rsf/blob/master/Function_list.md)
+The list of all the available function can be found [here](https://github.com/Umercia/rsf/blob/master/Function_list.md)
 
 
 Licence
