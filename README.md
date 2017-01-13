@@ -5,8 +5,6 @@
 
 ## Install from Github using R:
 
-Development version on [github](https://github.com/Umercia/rsf)
-
 ```r
 install.packages("devtools")
 library("devtools")
@@ -19,7 +17,7 @@ library("rsf")
 ## Usage examples
 ```r
 library(rsf)
-# Transform one rsf file
+# Transform one rsf file (crop and reduce the number of sectors)
 RSF_convert(rsf_file1 = "RSF-windresource-CFD_Hennoid [80m].rsf",  # rsf file name at H1=80m (*rsf)
             crop = TRUE,    # ask to crop the map around the wind farm (default value = 700 m around)
             layout_csv = "layout V2 Hennoid.csv",   # input file name for turbine positions (X,Y) (*csv)
@@ -43,8 +41,8 @@ RSF_convert(rsf_file1 = "RSF-windresource-CFD_Hennoid [80m].rsf",  # first rsf f
 
 
 #Visualisation of the new 3 dimensional rsf file (*.rsf)
-RSF_plot(rsf_file1 = "[3D][crop_700]Hennoid.rsf")
-
+RSF_plot(rsf_file1 = "[3D][crop_700]Hennoid.rsf")  
+# raster plot of A, k and wind speed (average or sectorwise)
 ```
 
 ![](figure/rsf_plot_example.png)
@@ -56,13 +54,22 @@ RSF_plot(rsf_file1 = "[3D][crop_700]Hennoid.rsf")
 #Visualisation of the shear file (*.csv)
 Shear_plot(rsf_file1 = "[shear_table][crop_700]Hennoid.csv", 
            layout_csv = "layout V2 Hennoid.csv") # layout input (optional)
+#ratser plot of wind shear (average or sectorwise)
 
 ```
 
 ![](figure/shear_plot_example.png)
 
 
+
+Function list
+-----------------
+
+The list of all the available function can be find [here](https://github.com/Umercia/rsf/blob/master/Function_list.md)
+
+
 Licence
 --------------
 This package is free and open source software, licensed under GPL (>= 2).
+
 

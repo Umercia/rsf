@@ -254,9 +254,9 @@ Read_RSF <- function(Input_file) {
 #' Crop_RSF Function
 #'
 #' Crop an *.rsf file around a rectangle define by Xmax, Xmin, Ymax, Ymin.
-#' @param rsf: "*.rsf" file ()
+#' @param rsf: rsf object already loaded into memory
 #' @param Xmax: X maximum limit
-#' @param Xmax: X minimum limit
+#' @param Xmin: X minimum limit
 #' @param Ymax: Y maximum limit
 #' @param Ymin: Y minimum limit
 #' @keywords rsf, crop
