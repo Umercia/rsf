@@ -1,6 +1,6 @@
 Package: rsf
 Title: rsf (basic manipulations and visualisation of wind ressource map files)
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 YEAR: 2016
 Authors@R: person("Maurice", "Clere", email = "cleremaurice@yahoo.fr",
                   role = c("aut", "cre"))
@@ -12,10 +12,12 @@ Imports:
     data.table,
     ggplot2,
 	manipulate,
-	readr,
 	gdata,
 	png,
 	tidyr,
+	tibble,
+	readr,
+	gtools,
 License: GPL-2
 Encoding: UTF-8
 LazyData: true

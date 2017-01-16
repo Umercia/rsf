@@ -87,6 +87,11 @@ RSF_convert <- function(rsf_file1,
 
 
         if (crop == TRUE) {
+
+            if (is.null(layout_csv)){
+                stop("Layout (*.csv) is needed to crop the map around it.")
+                }
+
             Xmax <- max(layout[, 1] + crop_buffer)
             Xmin <- min(layout[, 1] - crop_buffer)
             Ymax <- max(layout[, 2] + crop_buffer)
@@ -105,25 +110,37 @@ RSF_convert <- function(rsf_file1,
         if (twelve_S == TRUE) {
             rsf_H1_12 <- S36_to_S12_RSF(rsf_H1)
 
-            bench_table <- Bensh_RSF(rsf_H1, rsf_H1_12, layout, Gen_power_curve())
+            if (!is.null(layout_csv)) {
 
-            Ratio <- bench_table[, mean(ratio12_36)]
+                bench_table <- Bensh_RSF(rsf_H1, rsf_H1_12, layout, Gen_power_curve())
 
-            write.csv(bench_table,
-                      paste("benchmark_table_", output_name, ".csv", sep = ""))
+                Ratio <- bench_table[, mean(ratio12_36)]
+                Ratio <- round(Ratio * 100 - 100, 1) # extract the last unit and digit.
 
-            pdf(file = paste("benchmark_graph_", output_name, ".pdf", sep = ""))
-            hist(
-                bench_table$ratio12_36,
-                10,
-                col = "green",
-                main = "AEP ratio: 12 sectors versus 36 sectors",
-                xlab = "Ratio",
-                breaks = seq(0.9, 1.1, 0.005)
-            )
-            abline(v = mean(bench_table$ratio12_36), lwd = 3)
-            rug(bench_table$ratio12_36)
-            dev.off()
+                write.csv(bench_table,
+                          paste("benchmark_table_", output_name, ".csv", sep = ""))
+                message(paste("benchmark_table_", output_name, ".csv created in your working directory: ", getwd(), sep = ""))
+
+                pdf(file = paste("benchmark_graph_", output_name, ".pdf", sep = ""))
+                hist(
+                    bench_table$ratio12_36,
+                    10,
+                    col = "green",
+                    main = "AEP ratio: 12 sectors versus 36 sectors",
+                    xlab = "Ratio",
+                    breaks = seq(0.9, 1.1, 0.005)
+                )
+                abline(v = mean(bench_table$ratio12_36), lwd = 3)
+                rug(bench_table$ratio12_36)
+                dev.off()
+                message(paste("benchmark_graph_", output_name, ".pdf created in your working directory: ", getwd(), sep = ""))
+
+            } else {
+
+                warning("!!! No 36S/12S benshmark performed because no layout (*.csv) provided.")
+                Ratio <- "XX"
+
+            }
 
             rsf_H1 <- rsf_H1_12
             rm(rsf_H1_12)
@@ -136,7 +153,7 @@ RSF_convert <- function(rsf_file1,
 
             output_name <-
                 paste("[12S_",
-                      round(Ratio * 100 - 100, 1),
+                      Ratio,
                       "]",
                       output_name,
                       sep = "")
@@ -149,6 +166,7 @@ RSF_convert <- function(rsf_file1,
             shear_table_file_name <- paste("[shear_table]", output_name, ".csv", sep = "")
             shear_table <- Shear_RSF(rsf_H2, rsf_H1)
             ShearTable(shear_table, shear_table_file_name)  #create shear file
+            message(paste(shear_table_file_name, " created in your working directory: ", getwd(), sep = ""))
         }
 
 
@@ -172,6 +190,7 @@ RSF_convert <- function(rsf_file1,
         # Write to file -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
         Write_RSF(rsf_H1 , output_name)
+        message(paste(output_name, " created in your working directory: ", getwd(), sep = ""))
 
     }
 
