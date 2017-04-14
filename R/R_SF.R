@@ -45,6 +45,18 @@ RSF_convert <- function(rsf_file1,
         library("data.table")
 
         # read and parse data -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+        if(crop == TRUE & is.null(layout_csv)) {
+            stop("to crop the rsf file you need to provide a layout file")
+        } else if(twelve_S == TRUE & is.null(layout_csv)) {
+            warning("you did not provide any layout file, the benshmark will be bypassed")
+        } else if( (shear_out == TRUE | three_D == TRUE) & is.null(rsf_file2)) {
+            stop("you need to provide a second rsf file in order to create a 3 Dimensional rsf or a shear matrix")
+        }else if( !is.null(layer_H) & three_D == FALSE) {
+            stop("To extrapolate a signal to a new specific height you need to pass three_D parameter as TRUE")
+        }
+
+
         rsf_H1 <- Read_RSF(rsf_file1)
         H1 <- unique(rsf_H1[, Height])
 
