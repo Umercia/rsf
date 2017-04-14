@@ -10,6 +10,8 @@ install.packages("devtools")
 library("devtools")
 
 install_github('rsf',  username='umercia')
+# !! sometime, some dependencies (library) need to be installed manually (check the logs)
+
 library("rsf")
 
 ```
