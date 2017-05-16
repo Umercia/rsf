@@ -1385,3 +1385,18 @@ Shear_plot <- function(shear_file,layout_csv = NULL){
     )
 }
 
+Interpol_RSF <- function(rsf_H1, H2, shear = 0.2, shearmap) {
+    #interpol a map from H1 to H2 using a shear value (or shear map if provided)
+
+    N_Sector <- unique(rsf_H1[, Sector])
+    H1 <- unique(rsf_H1[, Height])
+    rsf_H2 <- data.table(rsf_H1)
+
+    for(i in 1:N_Sector){
+
+        j <- i * 3 + 7 # column number in the rsf data.tables for the concerned sector
+        rsf_H2[, j + 1 := round(rsf_H1[, j + 1, with = FALSE] * (H2 / H1) ^ shear), with = FALSE]     #Aave
+
+    }
+}
+
