@@ -276,7 +276,7 @@ Read_RSF <- function(Input_file) {
 
     if (is.na(RSF_table$Label[1])) {RSF_table$Label <- "RRR"} # to avoid issue in other functions
 
-    RSF_table <- RSF_table[order(RSF_table[, Y], RSF_table[, X])]   #Order the file: Y and X. Windpro is not always coherent when creating an rsf file from WasP.
+    RSF_table <- RSF_table[order(RSF_table[, Z],RSF_table[, Y], RSF_table[, X])]   #Order the file: Z, Y and X. Windpro is not always coherent when creating an rsf file from WasP.
 
     RSF_table
 
@@ -1390,13 +1390,23 @@ Interpol_RSF <- function(rsf_H1, H2, shear = 0.2, shearmap) {
 
     N_Sector <- unique(rsf_H1[, Sector])
     H1 <- unique(rsf_H1[, Height])
+
     rsf_H2 <- data.table(rsf_H1)
+    rsf_H2[, ':='(
+        Aave = round(rsf_H1[, Aave]  * (H2 / H1) ^ shear,2),
+        Height = H2)]
+
 
     for(i in 1:N_Sector){
-
         j <- i * 3 + 7 # column number in the rsf data.tables for the concerned sector
+
+
         rsf_H2[, j + 1 := round(rsf_H1[, j + 1, with = FALSE] * (H2 / H1) ^ shear), with = FALSE]     #Aave
 
     }
+
+    rsf_H2[1, 1] <-"Extrapol"
+    return(rsf_H2)
+
 }
 
