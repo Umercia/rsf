@@ -276,7 +276,7 @@ Read_RSF <- function(Input_file) {
 
     if (is.na(RSF_table$Label[1])) {RSF_table$Label <- "RRR"} # to avoid issue in other functions
 
-    RSF_table <- RSF_table[order(RSF_table[, Z],RSF_table[, Y], RSF_table[, X])]   #Order the file: Z, Y and X. Windpro is not always coherent when creating an rsf file from WasP.
+    RSF_table <- RSF_table[order(RSF_table[, Height],RSF_table[, Y], RSF_table[, X])]   #Order the file: Height, Y and X. Windpro is not always coherent when creating an rsf file from WasP.
 
     RSF_table
 
@@ -987,7 +987,7 @@ ShearExtract <- function(shear_csv, layout_csv, output_name = "shear_VSC_input.s
 
         shear <- read.csv2(shear_csv)
         shear <- data.table(shear)
-        shear <- subset(shear, select = -c(X999))
+        shear <- subset(shear, select = -c(X999, Z))
 
         layout <- read.csv(layout_csv)
         layout <- layout[complete.cases(layout), ]
