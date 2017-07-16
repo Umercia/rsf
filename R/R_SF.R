@@ -424,9 +424,12 @@ S36_to_S12_RSF <- function(RSF36) {
 #' write from memory a rsf (data table) into the file "rsf_80m_Aldermyberget.rsf":
 #' Write_RSF(rsf80, "rsf_80m_Aldermyberget.rsf")
 Write_RSF <- function(RSF, output_file_name) {
-    # write an rsf table ("RSF") in memory to a *.rsf file ("output_file_name")
+    # write an rsf table ("RSF") in memory to a *.rsf file ("output_file_name").
 
     library("gdata") ## use for the write.fwf function (write.fwf writes object in *f*ixed *w*idth *f*ormat )
+
+
+    output_file_name <- paste(output_file_name, ".rsf", sep= "")
 
     Num_Sectors <- RSF[, unique(Sector)]
     RSF_Col_Format <- c(c(10, 10, 10, 8, 5, 5, 6, 15, 3), rep(c(4, 4, 5), Num_Sectors))
@@ -1385,7 +1388,7 @@ Shear_plot <- function(shear_file,layout_csv = NULL){
     )
 }
 
-Interpol_RSF <- function(rsf_H1, H2, shear = 0.2, shearmap) {
+Extrapol_RSF <- function(rsf_H1, H2, shear = 0.2, shearmap) {
     #interpol a map from H1 to H2 using a shear value (or shear map if provided)
 
     N_Sector <- unique(rsf_H1[, Sector])
