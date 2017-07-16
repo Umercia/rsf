@@ -207,6 +207,68 @@ RSF_convert <- function(rsf_file1,
     }
 
 
+
+
+
+
+
+#' RSF_add_layer
+#'
+#' This function allows to add some layers (height) to a 3 dimensions rsf (meaning a rsf file with already two heights).
+#' The new rsf file will be created in the same folder, with the extra height(s) tagged in the file name.
+#' Note that the maximum and minimum height levels are used to interpolate or extrapolate. In case of Extrapolation, at least 20m difference is recommended in-betweens min and max level height
+#' @param rsf3D_file: 3 dimensional"*.rsf" file name (file name should be surounded by "")
+#' @param layer_H: vector containing  the level height to add.
+#' @param output_name: Output *.rsf file name " (name should be surounded by "").
+#' @keywords rsf, layer, 3D
+#' @export
+#' @examples
+#' Add height 30 and 217 to the rsf file "[3D][12S_-0.1]RSF-CFD_Douglas_West.rsf" :
+#' RSF_add_layer(rsf3D_file = "[3D][12S_-0.1]RSF-CFD_Douglas_West.rsf",layer_H = c(30,217))
+RSF_add_layer <- function(rsf3D_file, layer_H, output_name = rsf3D_file){
+
+    # read inputs -------------------------------------------------------------------------
+    rsf3D <- Read_RSF(rsf3D_file)
+    maxHeight <- max(unique(rsf3D$Height))
+    minHeight <- min(unique(rsf3D$Height))
+
+    if (abs(maxHeight - minHeight) < 20) {
+        warning(paste("the heigth difference is below 20m", maxHeight, minHeight))
+    }
+
+    # creation of new levels --------------------------------------------------------------
+    rsf_new_height <- Interpol_RSF(rsf_H1 = rsf3D[Height == maxHeight,],
+                                   rsf_H2 = rsf3D[Height == minHeight,],
+                                   layer_H = layer_H)
+
+    rsf_new_height <- rsf_new_height[Height == layer_H,]
+
+    rsf3D <- rbind(rsf3D,rsf_new_height)
+
+    rm(rsf_new_height)
+
+    # Name of the output file: tag the heights of the rsf3D -------------------------------
+
+    heights_n <- paste(unique(rsf3D$Height)[order(unique(rsf3D$Height))])
+
+    heights_n <- paste("[" , heights_n, "]",sep = "")
+
+    tag <- as.character()
+
+    for (i in 1:length(heights_n)){
+
+        tag <- paste(tag,heights_n[i],sep = "")
+
+    }
+
+    output_name <- paste(output_name,tag,sep = "")
+
+
+    # Write the results into a new rsf file ----------------------------------
+
+    Write_RSF(rsf3D, output_file_name = output_name)
+}
+
 #' Read_RSF Function
 #'
 #' This function allows you to read an *.rsf file. it reconises if it is 36 or 12 sectors, load it accordingly, with columns names.
