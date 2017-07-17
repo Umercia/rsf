@@ -199,17 +199,28 @@ RSF_convert <- function(rsf_file1,
         }
 
 
+
+        # Name of the output file: tag the heights of the rsf3D -------------------------------
+
+        heights_n <- paste(unique(rsf_H1$Height)[order(unique(rsf_H1$Height))])
+        heights_n <- paste("[" , heights_n, "]",sep = "")
+
+        tag <- as.character()
+
+        for (i in 1:length(heights_n)){
+
+            tag <- paste(tag,heights_n[i],sep = "")
+
+        }
+
+        output_name <- gsub(pattern = ".rsf|.RSF",replacement = "",x = output_name)  # remove the .rsf extension
+
         # Write to file -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
         Write_RSF(rsf_H1 , output_name)
         message(paste(output_name, " created in your working directory: ", getwd(), sep = ""))
 
     }
-
-
-
-
-
 
 
 #' RSF_add_layer
@@ -241,7 +252,7 @@ RSF_add_layer <- function(rsf3D_file, layer_H, output_name = rsf3D_file){
                                    rsf_H2 = rsf3D[Height == minHeight,],
                                    layer_H = layer_H)
 
-    rsf_new_height <- rsf_new_height[Height == layer_H,]
+    rsf_new_height <- rsf_new_height[Height %in% layer_H,]
 
     rsf3D <- rbind(rsf3D,rsf_new_height)
 
@@ -260,11 +271,12 @@ RSF_add_layer <- function(rsf3D_file, layer_H, output_name = rsf3D_file){
         tag <- paste(tag,heights_n[i],sep = "")
 
     }
+    output_name <- gsub(pattern = ".rsf|.RSF",replacement = "",x = output_name) # remove the .rsf extension
 
     output_name <- paste(output_name,tag,sep = "")
 
 
-    # Write the results into a new rsf file ----------------------------------
+    # Write the results into a new rsf file ------------------------------------------------
 
     Write_RSF(rsf3D, output_file_name = output_name)
 }
@@ -491,7 +503,7 @@ Write_RSF <- function(RSF, output_file_name) {
     library("gdata") ## use for the write.fwf function (write.fwf writes object in *f*ixed *w*idth *f*ormat )
 
 
-    output_file_name <- paste(output_file_name, ".rsf", sep= "")
+    output_file_name <- paste(output_file_name, ".rsf", sep= "")  #add rsf extension to the name
 
     Num_Sectors <- RSF[, unique(Sector)]
     RSF_Col_Format <- c(c(10, 10, 10, 8, 5, 5, 6, 15, 3), rep(c(4, 4, 5), Num_Sectors))
