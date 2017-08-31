@@ -2,16 +2,16 @@
 
 #' RSF_convert Function
 #'
-#' Do basic transformation on *.rsf file (rsf = wind ReSource File): Crop, convert in 12 sector, create new height levels, compute and export shear table.
-#' @param rsf_file1: Input *.rsf file name (name should be surounded by "").
-#' @param output_name: Output *.rsf file name " (name should be surounded by "").
-#' @param crop: Should the rsf be croped ?  TRUE/FALSE. Default value = FALSE.
-#' @param layout_csv: Input *.csv file name (name should be surounded by "")  containing the WTG positions (X,Y).Default value = NULL. This input is used to crop and benchmark the production (12 Sectors versus 36 sectors).
-#' @param crop_buffer: Integer value: Distance in meters around the WTG postions that should be crop (default value = 700m)
+#' Do basic transformation on *.rsf file (rsf = wind ReSource File): Crop, convert in 12 sector, create new hight levels, compute and export shear table.
+#' @param rsf_file1: Input *.rsf file name (name should be surrounded by "").
+#' @param output_name: Output *.rsf file name " (name should be surrounded by "").
+#' @param crop: Should the rsf be cropped ?  TRUE/FALSE. Default value = FALSE.
+#' @param layout_csv: Input *.csv file name (name should be surrounded by "")  containing the WTG positions (X,Y).Default value = NULL. This input is used to crop and benchmark the production (12 Sectors versus 36 sectors).
+#' @param crop_buffer: Integer value: Distance in meters around the WTG positions that should be cropped (default value = 700m)
 #' @param twelve_S: Should the rsf be converted into 12 sectors ?  TRUE/FALSE. Default value = FALSE.
-#' @param rsf_file2: Input *.rsf file name (name should be surounded by ""). Second rsf file used for shear and 3 dimensionals rsf creation. Default value = NULL.
+#' @param rsf_file2: Input *.rsf file name (name should be surrounded by ""). Second rsf file used for shear and 3 dimensional rsf creation. Default value = NULL.
 #' @param shear_out: Should the shear should be extracted and exported (csv file) ?  TRUE/FALSE. Default value = FALSE.
-#' @param three_D: Should a three dimensional rsf created  ? TRUE/FALSE. Default value = FALSE.
+#' @param three_D: Should a 3 dimensional rsf created  ? TRUE/FALSE. Default value = FALSE.
 #' @param layer_H: vector containing  the level of the 3 dimensional rsf (used if three_D = TRUE). if not filled and three_D = TRUE, the level multiple of 10 would be created. Default value = NULL.
 #' @keywords rsf, read, convert
 #' @export
@@ -49,7 +49,7 @@ RSF_convert <- function(rsf_file1,
         if(crop == TRUE & is.null(layout_csv)) {
             stop("to crop the rsf file you need to provide a layout file")
         } else if(twelve_S == TRUE & is.null(layout_csv)) {
-            warning("you did not provide any layout file, the benshmark will be bypassed")
+            warning("you did not provide any layout file, the benchmark will be bypassed")
         } else if( (shear_out == TRUE | three_D == TRUE) & is.null(rsf_file2)) {
             stop("you need to provide a second rsf file in order to create a 3 Dimensional rsf or a shear matrix")
         }else if( !is.null(layer_H) & three_D == FALSE) {
@@ -149,7 +149,7 @@ RSF_convert <- function(rsf_file1,
 
             } else {
 
-                warning("!!! No 36S/12S benshmark performed because no layout (*.csv) provided.")
+                warning("!!! No 36S/12S benchmark performed because no layout (*.csv) provided.")
                 Ratio <- "XX"
 
             }
@@ -193,7 +193,7 @@ RSF_convert <- function(rsf_file1,
                 layer_H <- layer_H[layer_H > min(H1, H2) & layer_H < max(H1, H2)]
             }
 
-            # creation of the 3 dimensionals rsf
+            # creation of the 3 dimensional rsf
             rsf_H1 <- Interpol_RSF(rsf_H1, rsf_H2, layer_H)
             output_name <- paste("[3D]", output_name, sep = "")
         }
@@ -227,10 +227,10 @@ RSF_convert <- function(rsf_file1,
 #'
 #' This function allows to add some layers (height) to a 3 dimensions rsf (meaning a rsf file with already two heights).
 #' The new rsf file will be created in the same folder, with the extra height(s) tagged in the file name.
-#' Note that the maximum and minimum height levels are used to interpolate or extrapolate. In case of Extrapolation, at least 20m difference is recommended in-betweens min and max level height
-#' @param rsf3D_file: 3 dimensional"*.rsf" file name (file name should be surounded by "")
+#' Note that the maximum and minimum height levels are used to interpolate or extrapolate. In case of extrapolation, at least 20m difference is recommended in-between min and max level height
+#' @param rsf3D_file: 3 dimensional"*.rsf" file name (file name should be surrounded by "")
 #' @param layer_H: vector containing  the level height to add.
-#' @param output_name: Output *.rsf file name " (name should be surounded by "").
+#' @param output_name: Output *.rsf file name " (name should be surrounded by "").
 #' @keywords rsf, layer, 3D
 #' @export
 #' @examples
@@ -283,7 +283,7 @@ RSF_add_layer <- function(rsf3D_file, layer_H, output_name = rsf3D_file){
 
 #' Read_RSF Function
 #'
-#' This function allows you to read an *.rsf file. it reconises if it is 36 or 12 sectors, load it accordingly, with columns names.
+#' This function allows you to read a *.rsf file. it recognises if it is 36 or 12 sectors, load it accordingly, with columns names.
 #' rsf = wind ReSource File. it is a wind mapping output from wind flow model. the new object will be a data.table
 #' @param Input_file: "*.rsf" file ()
 #' @keywords rsf, read
@@ -292,7 +292,7 @@ RSF_add_layer <- function(rsf3D_file, layer_H, output_name = rsf3D_file){
 #' load into memory an rsf file into the object rsf_166:
 #' rsf_166 <- Read_RSF("RSF-windresource-CFD_Aldermyrberget 166m.rsf")
 Read_RSF <- function(Input_file) {
-    ## function read an *.rsf file. it reconises if it is 36 or 12 sectors, load it accordingly, with columns names
+    ## function read an *.rsf file. it recognises if it is 36 or 12 sectors, load it accordingly, with columns names
 
     library("readr")              ## use for the read_fwf function much more faster than read.fwf
     library("data.table")         ## use forthe output format
@@ -489,7 +489,7 @@ S36_to_S12_RSF <- function(RSF36) {
 
 #' Write_RSF Function
 #'
-#' Write an rsf object from memory to a file (*.rsf). This file can be used with Windpro.
+#' Write a rsf object from memory to a file (*.rsf). This file can be used with Windpro.
 #' @param RSF: rsf object already loaded into memory
 #' @param output_file_name: name for the output file. it has to contain the extension .rsf.
 #' @keywords rsf, write
@@ -630,12 +630,12 @@ Prod_RSF <- function(rsf, Xp, Yp, power_curve) {
 
 #' Bensh_RSF Function
 #'
-#' Benshark wind turbine production of two different rsf (wind mapping). It is mainly use to benchmark 36 versus 12 sectors rsf.
+#' Benchmark wind turbine production of two different rsf (wind mapping). It is mainly used to benchmark 36 versus 12 sectors rsf.
 #' @param rsf36: first rsf object already loaded into memory
 #' @param rsf12: second rsf object already loaded into memory
 #' @param layout: data frame of two columns containing the turbine positions (X,Y).
 #' @param power_curve: power curve used to compute production. the format of power_curve is a data frame with two columns (Wind speed [m/s], power [kW]). can be generate by Gen_power_curve function.
-#' @keywords rsf, production, benshmark
+#' @keywords rsf, production, benchmark
 #' @export
 #' @examples
 #' Compute AEP for V117 on the position (3756122,1625482):
@@ -671,16 +671,16 @@ Bensh_RSF <- function(rsf36, rsf12, layout, power_curve) {
 #' Gen_power_curve Function
 #'
 #' Generate a power curve. the format of the generated power_curve is a data frame with two columns (Wind speed [m/s], power [kW])
-#' @param turbine: choose the turbine type. (for the moment only "V117-3.45" is availbale)
+#' @param turbine: choose the turbine type. (for the moment only "V117-3.45" is available)
 #' @keywords rsf, production, power curve
 #' @export
 #' @examples
 #' generate V117 power curve and store it in "pc" object:
 #' pc <- Gen_power_curve("V117-3.45")
 Gen_power_curve <- function(turbine = "V117-3.45") {
-    # genrate a power curve data frame, that can be used in other function. to
-    # match the dim of other function, the power curve need to go from 0ms to
-    # 40mS by 0.5ms. (to dev: add other turbine types)
+    # Genrate a power curve data frame, that can be used in other functions. to
+    # match the dim of other functions, the power curve need to go from 0 m/s to
+    # 40 m/s by 0.5m/s. (to dev: add other turbine types)
     PC <- data.frame(
         "wind_speed[m/s]" = seq(0, 40, 0.5),
         "Power[kW]" = c(
@@ -774,14 +774,14 @@ Gen_power_curve <- function(turbine = "V117-3.45") {
 #' Based on the interpolation of rsf at H1 and H2, this function creates a combined rsf file for H!, H2 and the height(s) provided in the vector "layer_H". it assumes a shear profile of the wind speed, and linear interpolation for the other parameters (Freq, and k). The function can actually extrapolate if needed. It is recommended that the difference H1-H2 is at least 20m.
 #' @param rsf_H1: first rsf object already loaded into memory (wind mapping at height H1)
 #' @param rsf_H2: second rsf object already loaded into memory (wind mapping at height H2)
-#' @param layer_H: vector containing target Heights [m] to add (height above the ground)
+#' @param layer_H: vector containing target heights [m] to add (height above the ground)
 #' @keywords rsf, interpolation
 #' @export
 #' @examples
 #' Generate rsf at 87m, 105m, 137m based on the rsf_100 and rsf150 inputs (respectively at 100m and 150m).
 #' rsf_3D <- Interpol_RSF(rsf_100, rsf_150,c(87,105,137))
 Interpol_RSF <- function(rsf_H1, rsf_H2, layer_H) {
-    # create a rsf file at the heigth(s) provided in the vector "layer_H", based on the interpolation of rsf at H1 and H2. it assumes a shear profile of the wind speed.
+    # Create a rsf file at the height(s) provided in the vector "layer_H", based on the interpolation of rsf at H1 and H2. it assumes a shear profile of the wind speed.
 
     # check the coherence of the grids (X,Y) of the two RSF. In order to work with column operations, grids should be exactly similar.
     if (min(rsf_H1[, X] == rsf_H2[, X]) == 0 |
@@ -852,7 +852,7 @@ Interpol_RSF <- function(rsf_H1, rsf_H2, layer_H) {
 
 #' Shear2png Function
 #'
-#' Export the "RSF_shear" rsf to a serie of georefenced images (*.png and *.pgw). For more information about the *.pgw (word file): https://en.wikipedia.org/wiki/World_file). those images can be directly used in windpro as background maps.
+#' Export the "RSF_shear" rsf to a series of georefenced images (*.png and *.pgw). For more information about the *.pgw (word file): https://en.wikipedia.org/wiki/World_file). Those images can be directly used in windpro as background maps.
 #' @param RSF_shear: "shear rsf" already loaded into memory (could be generated by the function Shear_RSF())
 #' @keywords rsf, shear, png
 #' @export
@@ -933,7 +933,7 @@ Shear2png <- function(RSF_shear) {
 
 #' Shear2pngV2 Function
 #'
-#' Save (export) the "RSF_shear" rsf to a serie (average and for all sectors) of georefenced images (*.png and *.pgw). for more information about the *.pgw (word file): https://en.wikipedia.org/wiki/World_file). those images can be directly used in windpro as background maps.
+#' Save (export) the "RSF_shear" rsf to a series (average and for all sectors) of georefenced images (*.png and *.pgw). for more information about the *.pgw (word file): https://en.wikipedia.org/wiki/World_file). Those images can be directly used in windpro as background maps.
 #' @param RSF_shear: "Shear rsf" already loaded into memory
 #' @keywords rsf, shear, png
 #' @export
@@ -1014,7 +1014,7 @@ Shear2pngV2 <- function(RSF_shear) {
 
 #' ShearTable Function
 #'
-#' Re-format the shear table (result from Shear_RSF) from (x,y,sector) table (3 x n) --> ((x,y) ~ sector) table (2+n_sector x n).it then writes the result in a csv file (can be used afterward to extrapolate to new HH or extract the shear value on some positions)
+#' Re-format the shear table (result from Shear_RSF) from (x,y,sector) table (3 x n) --> ((x,y) ~ sector) table (2+n_sector x n).it then writes the result in a csv file (can be used afterwards to extrapolate to new HH or extract the shear value on some positions)
 #' @param RSF_shear: "Shear rsf" already loaded into memory
 #' @param output_name: name for the output file. it has to contain the extension "*.csv"
 #' @keywords rsf, shear, csv
@@ -1025,8 +1025,8 @@ Shear2pngV2 <- function(RSF_shear) {
 #' ShearTable(shear_,"Sheartable.csv")
 ShearTable <- function(RSF_shear, output_name = "sheartable.csv") {
     # Re-format the shear table (result from Shear_RSF) from (x,y,sector) table (3 x n) --> ((x,y) ~ sector) table (2+n_sector x n)
-    # write the result in a csv file (can be used afterward to extrapolate to new HH or extract the shear value on some positions)
-    # Note for later: should be directly implemented into Shear_RSF (need to change the shear2png function)
+    # write the result in a csv file (can be used afterwards to extrapolate to new HH or extract the shear value on some positions)
+    # Notes for later: should be directly implemented into Shear_RSF (need to change the shear2png function)
 
     library(tidyr)    # use for the spread function
 
@@ -1055,7 +1055,7 @@ ShearTable <- function(RSF_shear, output_name = "sheartable.csv") {
 #' shear_ <- Shear_RSF(rsf87,rsf137)
 #' ShearExtract("Sheartable.csv","layout_file.csv","shear_VSC_input.shr")
 ShearExtract <- function(shear_csv, layout_csv, output_name = "shear_VSC_input.shr") {
-        # Extract shear at turbine locations, and creat a *.shr file for VSC (use as CFD input)
+        # Extract shear at turbine locations, and create a *.shr file for VSC (use as CFD input)
         # shear_csv: shear file in CSV format (output of "ShearTable" function)
         # layout_csv: layout file in csv format (X,Y)
         # output_name: name of the output file (*.shr)
@@ -1099,8 +1099,8 @@ ShearExtract <- function(shear_csv, layout_csv, output_name = "shear_VSC_input.s
 #' RSF_plot Function
 #'
 #' Interactive plot (raster/map) of an rsf object ( direction versus (Height, A, k, Wind speed) )
-#' @param rsf_file: Input *.rsf file name (name should be surounded by "").
-#' @param layout_csv: Input *.csv file name (name should be surounded by "") containing the WTG positions (X,Y).Default value = NULL. if provided, turbine postions would be plotted on the map.
+#' @param rsf_file: Input *.rsf file name (name should be surrounded by "").
+#' @param layout_csv: Input *.csv file name (name should be surrounded by "") containing the WTG positions (X,Y).Default value = NULL. if provided, turbine positions would be plotted on the map.
 #' @keywords rsf, plot, vizualisation
 #' @export
 #' @examples
@@ -1394,8 +1394,8 @@ RSF_plot <- function(rsf_file,layout_csv = NULL){
 #' Shear_plot Function
 #'
 #' Interactive plot (raster/map) of a shear table file (*.csv) (X,Y,direction versus shear)
-#' @param rsf_file: Input *.rsf file name (name should be surounded by "").
-#' @param layout_csv: Input *.csv file name (name should be surounded by "") containing the WTG positions (X,Y).Default value = NULL. if provided, turbine postions would be plotted on the map.
+#' @param rsf_file: Input *.rsf file name (name should be surrounded by "").
+#' @param layout_csv: Input *.csv file name (name should be surrounded by "") containing the WTG positions (X,Y).Default value = NULL. if provided, turbine positions would be plotted on the map.
 #' @keywords shear, plot, vizualisation
 #' @export
 #' @examples
