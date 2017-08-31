@@ -1,7 +1,7 @@
 
 ## rsf
 
-`rsf` package provides functions to make some basic manipulation on wind ressource file (*.rsf) and some plot functions to visualise inputs and outputs.
+`rsf` package provides functions to make some basic manipulation wind resource files (*.rsf): crop, combine,reduce the number of sectors, vertical extrapolation, wind shear extraction, visualisation, ...
 
 ## Install from Github using R:
 
