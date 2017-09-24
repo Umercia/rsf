@@ -292,27 +292,54 @@ RSF_add_layer <- function(rsf3D_file, layer_H, output_name = rsf3D_file){
 #' load into memory an rsf file into the object rsf_166:
 #' rsf_166 <- Read_RSF("RSF-windresource-CFD_Aldermyrberget 166m.rsf")
 Read_RSF <- function(Input_file) {
-    ## function read an *.rsf file. it recognises if it is 36 or 12 sectors, load it accordingly, with columns names
-
-    library("readr")              ## use for the read_fwf function much more faster than read.fwf
-    library("data.table")         ## use forthe output format
-
-    con <- file(Input_file, "r")
-    line <- readLines(con, 1)      ## sample line to check if it is a 36 sectors or 12 sectors file
-    close(con)
-
-    if (nchar(line) > 400) {
-        ## it means it should be a 36 sectors (actually 36S should be exactly 540)
-        RSF_Col_Format <- c(10, 10, 10, 8, 5, 6, 5, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5)
-
-
-        ## creation of colomn name vector
-        RSF_Col_Name <- c("Label",
+        ## function read an *.rsf file. it recognises if it is 36 or 12 sectors, load it accordingly, with columns names
+        
+        library("readr")              ## use for the read_fwf function much more faster than read.fwf
+        library("data.table")         ## use forthe output format
+        
+        file_type = substr(x = Input_file, start = nchar(Input_file)-2,stop = nchar(Input_file))
+        
+        if (file_type == "rsf" | file_type == "wrg") {
+                print(paste("Read_RSF, detected input file format:", file_type))
+        } else {
+                stop(paste("Error Read_RSF - Unknow file format:", file_type))
+        }
+        
+        con <- file(Input_file, "r")
+        line <- readLines(con, 1)      ## sample line to check if it is a 36 sectors or 12 sectors file
+        line <- readLines(con, 1)      ## read the second line: skip the first line in case of a *.wrg input
+        close(con)
+        
+        if (nchar(line) > 400) {
+                ## it means it should be a 36 sectors (actually 36S should be exactly 540)
+                RSF_Col_Format <- c(10, 10, 10, 8, 5, 5, 6, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                                    4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                                    4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                                    4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                                    4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                                    4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5)
+                
+                
+                ## creation of colomn name vector
+                RSF_Col_Name <- c("Label",
+                                  "X",
+                                  "Y",
+                                  "Z",
+                                  "Height",
+                                  "Aave",
+                                  "k",
+                                  "Blank",
+                                  "Sector")
+                RSF_Col_Name <- c(RSF_Col_Name, paste(c("F36_", "A36_", "k36_"), rep(c("000","010","020","030","040","050","060","070","080","090","100","110","120","130","140","150","160","170","180","190","200","210","220","230","240","250","260","270","280","290","300","310","320","330","340","350"), each = 3), sep = ""))
+                
+        } else{
+                ##if less than 400, then it means it should be a 12 sectors (actually 12S should be exactly 228)
+                RSF_Col_Format <- c(10, 10, 10, 8, 5, 5, 6, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                                    4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                                    4, 5, 4, 4, 5)
+                
+                RSF_Col_Name <-
+                        c("Label",
                           "X",
                           "Y",
                           "Z",
@@ -321,39 +348,28 @@ Read_RSF <- function(Input_file) {
                           "k",
                           "Blank",
                           "Sector")
-        RSF_Col_Name <- c(RSF_Col_Name, paste(c("F36_", "A36_", "k36_"), rep(c("000","010","020","030","040","050","060","070","080","090","100","110","120","130","140","150","160","170","180","190","200","210","220","230","240","250","260","270","280","290","300","310","320","330","340","350"), each = 3), sep = ""))
-
-    } else{
-        ##if less than 400, then it means it should be a 12 sectors (actually 12S should be exactly 228)
-        RSF_Col_Format <- c(10, 10, 10, 8, 5, 6, 5, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
-                            4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
-                            4, 5, 4, 4, 5)
-
-        RSF_Col_Name <-
-            c("Label",
-              "X",
-              "Y",
-              "Z",
-              "Height",
-              "Aave",
-              "k",
-              "Blank",
-              "Sector")
-        RSF_Col_Name <- c(RSF_Col_Name, paste(c("F12_", "A12_", "k12_"), rep(c("000","030","060","090","120","150","180","210","240","270","300","330"), each = 3), sep = ""))
-    }
-
-    RSF_table <-
-        data.table(read_fwf(
-            Input_file,
-            fwf_widths(RSF_Col_Format, col_names = RSF_Col_Name)
-        ))
-
-    if (is.na(RSF_table$Label[1])) {RSF_table$Label <- "RRR"} # to avoid issue in other functions
-
-    RSF_table <- RSF_table[order(RSF_table[, Height],RSF_table[, Y], RSF_table[, X])]   #Order the file: Height, Y and X. Windpro is not always coherent when creating an rsf file from WasP.
-
-    RSF_table
-
+                RSF_Col_Name <- c(RSF_Col_Name, paste(c("F12_", "A12_", "k12_"), rep(c("000","030","060","090","120","150","180","210","240","270","300","330"), each = 3), sep = ""))
+        }
+        
+       
+        
+        if (file_type == "rsf") {
+                RSF_table <- data.table(read_fwf(
+                        Input_file,
+                        fwf_widths(RSF_Col_Format, col_names = RSF_Col_Name)
+                ))
+        } else if (file_type == "wrg") {
+                RSF_table <- data.table(read.table(file = Input_file, skip = 1, col.names = RSF_Col_Name))
+                
+        }
+        
+        
+        if (is.na(RSF_table$Label[1])) {RSF_table$Label <- "RRR"} # to avoid issue in other functions
+        
+        RSF_table <- RSF_table[order(RSF_table[, Height],RSF_table[, Y], RSF_table[, X])]   #Order the file: Height, Y and X. Windpro is not always coherent when creating an rsf file from WasP.
+        
+        RSF_table
+        
 }
 
 #' Crop_RSF Function
