@@ -529,6 +529,19 @@ Write_RSF <- function(RSF, output_file_name) {
     Num_Sectors <- RSF[, unique(Sector)]
     RSF_Col_Format <- c(c(10, 10, 10, 8, 5, 5, 6, 15, 3), rep(c(4, 4, 5), Num_Sectors))
 
+    
+    for(col in grep(pattern = "A[0-9]",x = names(RSF), value = TRUE)){    # set 2 m/s as the minimum A (remove extrapolation artefacts)
+            set(RSF, i=which(RSF[[col]] < 20), j=col, value= 20)    
+            
+    } 
+ 
+    for(col in grep(pattern = "A[0-9]",x = names(RSF), value = TRUE)){    # set 20 m/s as the maximum A (remove extrapolation artefacts)
+            set(RSF, i=which(RSF[[col]] > 200), j=col, value= 200)    
+            
+    }    
+    
+    
+    
     # write the results of the 12 sectors RSF in a file (Fixe Wild File)
     write.fwf(
         RSF,
