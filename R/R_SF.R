@@ -368,6 +368,11 @@ Read_RSF <- function(Input_file) {
         
         RSF_table <- RSF_table[order(RSF_table[, Height],RSF_table[, Y], RSF_table[, X])]   #Order the file: Height, Y and X. Windpro is not always coherent when creating an rsf file from WasP.
         
+        for(col in grep(pattern = "A[0-9]",x = names(RSF_table), value = TRUE)){    # set 2 m/s as the minimum A ("0m/s" creates issue in the extrapolation)
+                set(RSF_table, i=which(RSF_table[[col]] < 20), j=col, value= 20)    
+                
+        } 
+        
         RSF_table
         
 }
