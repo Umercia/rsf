@@ -293,23 +293,22 @@ RSF_add_layer <- function(rsf3D_file, layer_H, output_name = rsf3D_file){
 #' rsf_166 <- Read_RSF("RSF-windresource-CFD_Aldermyrberget 166m.rsf")
 Read_RSF <- function(Input_file) {
         ## function read an *.rsf file. it recognises if it is 36 or 12 sectors, load it accordingly, with columns names
-        
         library("readr")              ## use for the read_fwf function much more faster than read.fwf
         library("data.table")         ## use forthe output format
-        
+
         file_type = substr(x = Input_file, start = nchar(Input_file)-2,stop = nchar(Input_file))
-        
+
         if (file_type == "rsf" | file_type == "wrg") {
                 print(paste("Read_RSF, detected input file format:", file_type))
         } else {
                 stop(paste("Error Read_RSF - Unknow file format:", file_type))
         }
-        
+
         con <- file(Input_file, "r")
         line <- readLines(con, 1)      ## sample line to check if it is a 36 sectors or 12 sectors file
         line <- readLines(con, 1)      ## read the second line: skip the first line in case of a *.wrg input
         close(con)
-        
+
         if (nchar(line) > 400) {
                 ## it means it should be a 36 sectors (actually 36S should be exactly 540)
                 RSF_Col_Format <- c(10, 10, 10, 8, 5, 5, 6, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
@@ -318,8 +317,8 @@ Read_RSF <- function(Input_file) {
                                     4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
                                     4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
                                     4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5)
-                
-                
+
+
                 ## creation of colomn name vector
                 RSF_Col_Name <- c("Label",
                                   "X",
@@ -331,13 +330,13 @@ Read_RSF <- function(Input_file) {
                                   "Blank",
                                   "Sector")
                 RSF_Col_Name <- c(RSF_Col_Name, paste(c("F36_", "A36_", "k36_"), rep(c("000","010","020","030","040","050","060","070","080","090","100","110","120","130","140","150","160","170","180","190","200","210","220","230","240","250","260","270","280","290","300","310","320","330","340","350"), each = 3), sep = ""))
-                
+
         } else{
                 ##if less than 400, then it means it should be a 12 sectors (actually 12S should be exactly 228)
                 RSF_Col_Format <- c(10, 10, 10, 8, 5, 5, 6, 15, 3, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
                                     4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4,
                                     4, 5, 4, 4, 5)
-                
+
                 RSF_Col_Name <-
                         c("Label",
                           "X",
@@ -350,9 +349,9 @@ Read_RSF <- function(Input_file) {
                           "Sector")
                 RSF_Col_Name <- c(RSF_Col_Name, paste(c("F12_", "A12_", "k12_"), rep(c("000","030","060","090","120","150","180","210","240","270","300","330"), each = 3), sep = ""))
         }
-        
-       
-        
+
+
+
         if (file_type == "rsf") {
                 RSF_table <- data.table(read_fwf(
                         Input_file,
@@ -360,21 +359,21 @@ Read_RSF <- function(Input_file) {
                 ))
         } else if (file_type == "wrg") {
                 RSF_table <- data.table(read.table(file = Input_file, skip = 1, col.names = RSF_Col_Name))
-                
+
         }
-        
-        
+
+
         if (is.na(RSF_table$Label[1])) {RSF_table$Label <- "RRR"} # to avoid issue in other functions
-        
+
         RSF_table <- RSF_table[order(RSF_table[, Height],RSF_table[, Y], RSF_table[, X])]   #Order the file: Height, Y and X. Windpro is not always coherent when creating an rsf file from WasP.
-        
+
         for(col in grep(pattern = "A[0-9]",x = names(RSF_table), value = TRUE)){    # set 2 m/s as the minimum A ("0m/s" creates issue in the extrapolation)
-                set(RSF_table, i=which(RSF_table[[col]] < 20), j=col, value= 20)    
-                
-        } 
-        
+                set(RSF_table, i=which(RSF_table[[col]] < 20), j=col, value= 20)
+
+        }
+
         RSF_table
-        
+
 }
 
 #' Crop_RSF Function
@@ -529,19 +528,19 @@ Write_RSF <- function(RSF, output_file_name) {
     Num_Sectors <- RSF[, unique(Sector)]
     RSF_Col_Format <- c(c(10, 10, 10, 8, 5, 5, 6, 15, 3), rep(c(4, 4, 5), Num_Sectors))
 
-    
+
     for(col in grep(pattern = "A[0-9]",x = names(RSF), value = TRUE)){    # set 2 m/s as the minimum A (remove extrapolation artefacts)
-            set(RSF, i=which(RSF[[col]] < 20), j=col, value= 20)    
-            
-    } 
- 
+            set(RSF, i=which(RSF[[col]] < 20), j=col, value= 20)
+
+    }
+
     for(col in grep(pattern = "A[0-9]",x = names(RSF), value = TRUE)){    # set 20 m/s as the maximum A (remove extrapolation artefacts)
-            set(RSF, i=which(RSF[[col]] > 200), j=col, value= 200)    
-            
-    }    
-    
-    
-    
+            set(RSF, i=which(RSF[[col]] > 200), j=col, value= 200)
+
+    }
+
+
+
     # write the results of the 12 sectors RSF in a file (Fixe Wild File)
     write.fwf(
         RSF,
@@ -1521,3 +1520,106 @@ Extrapol_RSF <- function(rsf_H1, H2, shear = 0.2, shearmap) {
 
 }
 
+
+#' RSF_scale
+#'
+#' This function allows to add scale a rsf with a factor x.
+#' The new rsf file will be created in the same folder, with the scale factor tagged in the file name.
+#' Note that the scale is purely apply to the A parameter of the weibull distribution (k stay unchanged)
+#' @param rsf_file: Input *.rsf file name (name should be surrounded by "").
+#' @param scale_factor: the A value of the rsf will be multiply by this value.
+#' @param output_name: Output *.rsf file name " (name should be surrounded by "").
+#' @keywords rsf, scale
+#' @export
+#' @examples
+#' Scale the rsf file "RSF-CFD_Douglas_West.rsf" by 1.11 (add 11 percents to the wind speed)  :
+#' RSF_scale(rsf_file_file = "RSF-CFD_Douglas_West.rsf",scale = 1.11)
+RSF_scale <- function(rsf_file, scale_factor, output_name = rsf_file){
+
+    # read inputs -------------------------------------------------------------------------
+    rsf <- Read_RSF(rsf_file)
+    Num_Sectors <- rsf[, unique(Sector)]
+
+
+    # creation of new levels --------------------------------------------------------------
+
+    # scaling the A columns*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+
+    if(Num_Sectors == 12) {
+
+
+        rsf[, ':='(Aave = round(Aave*scale_factor,2),
+                   A12_000 = as.integer(round( A12_000*scale_factor)),
+                   A12_030 = as.integer(round( A12_030*scale_factor)),
+                   A12_060 = as.integer(round( A12_060*scale_factor)),
+                   A12_090 = as.integer(round( A12_090*scale_factor)),
+                   A12_120 = as.integer(round( A12_120*scale_factor)),
+                   A12_150 = as.integer(round( A12_150*scale_factor)),
+                   A12_180 = as.integer(round( A12_180*scale_factor)),
+                   A12_210 = as.integer(round( A12_210*scale_factor)),
+                   A12_240 = as.integer(round( A12_240*scale_factor)),
+                   A12_270 = as.integer(round( A12_270*scale_factor)),
+                   A12_300 = as.integer(round( A12_300*scale_factor)),
+                   A12_330 = as.integer(round( A12_330*scale_factor)))]
+
+    }
+
+    if(Num_Sectors == 36) {
+
+
+        rsf[, ':=' (Aave = round( Aave*scale_factor,2),
+                    A36_000 = as.integer(round( A36_000*scale_factor)),
+                    A36_010 = as.integer(round( A36_010*scale_factor)),
+                    A36_020 = as.integer(round( A36_020*scale_factor)),
+                    A36_030 = as.integer(round( A36_030*scale_factor)),
+                    A36_040 = as.integer(round( A36_040*scale_factor)),
+                    A36_050 = as.integer(round( A36_050*scale_factor)),
+                    A36_060 = as.integer(round( A36_060*scale_factor)),
+                    A36_070 = as.integer(round( A36_070*scale_factor)),
+                    A36_080 = as.integer(round( A36_080*scale_factor)),
+                    A36_090 = as.integer(round( A36_090*scale_factor)),
+                    A36_100 = as.integer(round( A36_100*scale_factor)),
+                    A36_110 = as.integer(round( A36_110*scale_factor)),
+                    A36_120 = as.integer(round( A36_120*scale_factor)),
+                    A36_130 = as.integer(round( A36_130*scale_factor)),
+                    A36_140 = as.integer(round( A36_140*scale_factor)),
+                    A36_150 = as.integer(round( A36_150*scale_factor)),
+                    A36_160 = as.integer(round( A36_160*scale_factor)),
+                    A36_170 = as.integer(round( A36_170*scale_factor)),
+                    A36_180 = as.integer(round( A36_180*scale_factor)),
+                    A36_190 = as.integer(round( A36_190*scale_factor)),
+                    A36_200 = as.integer(round( A36_200*scale_factor)),
+                    A36_210 = as.integer(round( A36_210*scale_factor)),
+                    A36_220 = as.integer(round( A36_220*scale_factor)),
+                    A36_230 = as.integer(round( A36_230*scale_factor)),
+                    A36_240 = as.integer(round( A36_240*scale_factor)),
+                    A36_250 = as.integer(round( A36_250*scale_factor)),
+                    A36_260 = as.integer(round( A36_260*scale_factor)),
+                    A36_270 = as.integer(round( A36_270*scale_factor)),
+                    A36_280 = as.integer(round( A36_280*scale_factor)),
+                    A36_290 = as.integer(round( A36_290*scale_factor)),
+                    A36_300 = as.integer(round( A36_300*scale_factor)),
+                    A36_310 = as.integer(round( A36_310*scale_factor)),
+                    A36_320 = as.integer(round( A36_320*scale_factor)),
+                    A36_330 = as.integer(round( A36_330*scale_factor)),
+                    A36_340 = as.integer(round( A36_340*scale_factor)),
+                    A36_350 = as.integer(round( A36_350*scale_factor)))]
+
+    }
+
+
+    # Name of the output file: tag tthe scaling factor ------------------------------------
+
+    tag <- as.character(scale_factor)
+
+
+    output_name <- gsub(pattern = ".rsf|.RSF",replacement = "",x = output_name) # remove the .rsf extension
+
+    output_name <- paste("[scl_",tag,"]", output_name,sep = "")
+
+
+    # Write the results into a new rsf file ------------------------------------------------
+
+    Write_RSF(rsf, output_file_name = output_name)
+}
