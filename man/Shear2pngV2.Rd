@@ -10,7 +10,7 @@ Shear2pngV2(RSF_shear)
 \item{RSF_shear:}{"Shear rsf" already loaded into memory}
 }
 \description{
-Save (export) the "RSF_shear" rsf to a serie (average and for all sectors) of georefenced images (*.png and *.pgw). for more information about the *.pgw (word file): https://en.wikipedia.org/wiki/World_file). those images can be directly used in windpro as background maps.
+Save (export) the "RSF_shear" rsf to a series (average and for all sectors) of georefenced images (*.png and *.pgw). for more information about the *.pgw (word file): https://en.wikipedia.org/wiki/World_file). Those images can be directly used in windpro as background maps.
 }
 \examples{
 generate a shear rsf from rsf_87 and rsf137 and export it into png pictures.
@@ -20,4 +20,3 @@ Shear2pngV2(shear_)
 \keyword{png}
 \keyword{rsf,}
 \keyword{shear,}
-

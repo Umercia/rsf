@@ -7,9 +7,9 @@
 Shear_plot(shear_file, layout_csv = NULL)
 }
 \arguments{
-\item{rsf_file:}{Input *.rsf file name (name should be surounded by "").}
+\item{rsf_file:}{Input *.rsf file name (name should be surrounded by "").}
 
-\item{layout_csv:}{Input *.csv file name (name should be surounded by "") containing the WTG positions (X,Y).Default value = NULL. if provided, turbine postions would be plotted on the map.}
+\item{layout_csv:}{Input *.csv file name (name should be surrounded by "") containing the WTG positions (X,Y).Default value = NULL. if provided, turbine positions would be plotted on the map.}
 }
 \description{
 Interactive plot (raster/map) of a shear table file (*.csv) (X,Y,direction versus shear)
@@ -20,4 +20,3 @@ Shear_plot("Aldermyrberget 166m.rsf",layout_csv = "layout V14A.csv")
 \keyword{plot,}
 \keyword{shear,}
 \keyword{vizualisation}
-

@@ -20,4 +20,3 @@ rsf_shear <- Shear_RSF(rsf87,rsf137)
 }
 \keyword{rsf,}
 \keyword{shear}
-

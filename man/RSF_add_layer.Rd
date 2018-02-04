@@ -7,16 +7,16 @@
 RSF_add_layer(rsf3D_file, layer_H, output_name = rsf3D_file)
 }
 \arguments{
-\item{rsf3D_file:}{3 dimensional"*.rsf" file name (file name should be surounded by "")}
+\item{rsf3D_file:}{3 dimensional"*.rsf" file name (file name should be surrounded by "")}
 
 \item{layer_H:}{vector containing  the level height to add.}
 
-\item{output_name:}{Output *.rsf file name " (name should be surounded by "").}
+\item{output_name:}{Output *.rsf file name " (name should be surrounded by "").}
 }
 \description{
 This function allows to add some layers (height) to a 3 dimensions rsf (meaning a rsf file with already two heights).
 The new rsf file will be created in the same folder, with the extra height(s) tagged in the file name.
-Note that the maximum and minimum height levels are used to interpolate or extrapolate. In case of Extrapolation, at least 20m difference is recommended in-betweens min and max level height
+Note that the maximum and minimum height levels are used to interpolate or extrapolate. In case of extrapolation, at least 20m difference is recommended in-between min and max level height
 }
 \examples{
 Add height 30 and 217 to the rsf file "[3D][12S_-0.1]RSF-CFD_Douglas_West.rsf" :
@@ -25,4 +25,3 @@ RSF_add_layer(rsf3D_file = "[3D][12S_-0.1]RSF-CFD_Douglas_West.rsf",layer_H = c(
 \keyword{3D}
 \keyword{layer,}
 \keyword{rsf,}
-

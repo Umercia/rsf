@@ -16,7 +16,7 @@ Bensh_RSF(rsf36, rsf12, layout, power_curve)
 \item{power_curve:}{power curve used to compute production. the format of power_curve is a data frame with two columns (Wind speed [m/s], power [kW]). can be generate by Gen_power_curve function.}
 }
 \description{
-Benshark wind turbine production of two different rsf (wind mapping). It is mainly use to benchmark 36 versus 12 sectors rsf.
+Benchmark wind turbine production of two different rsf (wind mapping). It is mainly used to benchmark 36 versus 12 sectors rsf.
 }
 \examples{
 Compute AEP for V117 on the position (3756122,1625482):
@@ -24,7 +24,6 @@ layout <- read.csv("layout_file.csv")
 pc <- Gen_power_curve("V117-3.45")
 bench_table <- Bensh_RSF(rsf_H1_36,rsf_H1_12, layout, pc)
 }
-\keyword{benshmark}
+\keyword{benchmark}
 \keyword{production,}
 \keyword{rsf,}
-

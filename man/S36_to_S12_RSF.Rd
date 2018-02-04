@@ -19,4 +19,3 @@ rsf87_12S <- S36_to_S12_RSF(rsf87_36S)
 \keyword{36,}
 \keyword{convertion}
 \keyword{rsf,}
-

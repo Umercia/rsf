@@ -26,4 +26,3 @@ rsf_166 <- Read_RSF("RSF-windresource-CFD_Aldermyrberget 166m.rsf")
 }
 \keyword{crop}
 \keyword{rsf,}
-

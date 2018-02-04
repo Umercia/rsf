@@ -77,7 +77,18 @@ Raster plot of A, k and wind speed (Average or Sectorwise). If provided it will 
 ```r        
             Example: 
             ShearExtract("sheartable.csv","layout_Saint_Martin.csv")
-```          
+```    
+
+  * **RSF_scale <- RSF_scale <- function(rsf_file, scale_factor, output_name = rsf_file)**  
+    Scale a rsf file "rsf_file" with the "scale_factor". The new rsf file will be created in the same folder, with the scale factor tagged in the file name.
+    Note that the scaling is purely apply to the A parameter of the weibull distribution (k stay unchanged).
+    + rsf_file:	Input *.rsf file name (name should be surrounded by "").
+    + scale_factor: Weibull A values of the rsf will be multiply by this value. Typical value around [0.5;1.5].
+    + output_name: Output *.rsf file name " (name should be surrounded by "").
+```r            
+            Example: 
+            RSF_scale(rsf_file = "RSF-CFD_Douglas_West.rsf",scale_factor = 1.11) 
+```    
 
 
 ### Root functions:

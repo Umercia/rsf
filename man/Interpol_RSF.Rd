@@ -11,7 +11,7 @@ Interpol_RSF(rsf_H1, rsf_H2, layer_H)
 
 \item{rsf_H2:}{second rsf object already loaded into memory (wind mapping at height H2)}
 
-\item{layer_H:}{vector containing target Heights [m] to add (height above the ground)}
+\item{layer_H:}{vector containing target heights [m] to add (height above the ground)}
 }
 \description{
 Based on the interpolation of rsf at H1 and H2, this function creates a combined rsf file for H!, H2 and the height(s) provided in the vector "layer_H". it assumes a shear profile of the wind speed, and linear interpolation for the other parameters (Freq, and k). The function can actually extrapolate if needed. It is recommended that the difference H1-H2 is at least 20m.
@@ -22,4 +22,3 @@ rsf_3D <- Interpol_RSF(rsf_100, rsf_150,c(87,105,137))
 }
 \keyword{interpolation}
 \keyword{rsf,}
-

@@ -24,4 +24,3 @@ ShearExtract("Sheartable.csv","layout_file.csv","shear_VSC_input.shr")
 \keyword{extraction}
 \keyword{rsf,}
 \keyword{shear,}
-

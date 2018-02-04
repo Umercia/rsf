@@ -7,7 +7,7 @@
 Gen_power_curve(turbine = "V117-3.45")
 }
 \arguments{
-\item{turbine:}{choose the turbine type. (for the moment only "V117-3.45" is availbale)}
+\item{turbine:}{choose the turbine type. (for the moment only "V117-3.45" is available)}
 }
 \description{
 Generate a power curve. the format of the generated power_curve is a data frame with two columns (Wind speed [m/s], power [kW])
@@ -20,4 +20,3 @@ pc <- Gen_power_curve("V117-3.45")
 \keyword{power}
 \keyword{production,}
 \keyword{rsf,}
-

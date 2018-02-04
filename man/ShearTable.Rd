@@ -12,7 +12,7 @@ ShearTable(RSF_shear, output_name = "sheartable.csv")
 \item{output_name:}{name for the output file. it has to contain the extension "*.csv"}
 }
 \description{
-Re-format the shear table (result from Shear_RSF) from (x,y,sector) table (3 x n) --> ((x,y) ~ sector) table (2+n_sector x n).it then writes the result in a csv file (can be used afterward to extrapolate to new HH or extract the shear value on some positions)
+Re-format the shear table (result from Shear_RSF) from (x,y,sector) table (3 x n) --> ((x,y) ~ sector) table (2+n_sector x n).it then writes the result in a csv file (can be used afterwards to extrapolate to new HH or extract the shear value on some positions)
 }
 \examples{
 generate a shear rsf from rsf_87_12S and rsf137_12S and export it into png pictures.
@@ -22,4 +22,3 @@ ShearTable(shear_,"Sheartable.csv")
 \keyword{csv}
 \keyword{rsf,}
 \keyword{shear,}
-

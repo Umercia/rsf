@@ -10,7 +10,7 @@ Read_RSF(Input_file)
 \item{Input_file:}{"*.rsf" file ()}
 }
 \description{
-This function allows you to read an *.rsf file. it reconises if it is 36 or 12 sectors, load it accordingly, with columns names.
+This function allows you to read a *.rsf file. it recognises if it is 36 or 12 sectors, load it accordingly, with columns names.
 rsf = wind ReSource File. it is a wind mapping output from wind flow model. the new object will be a data.table
 }
 \examples{
@@ -19,4 +19,3 @@ rsf_166 <- Read_RSF("RSF-windresource-CFD_Aldermyrberget 166m.rsf")
 }
 \keyword{read}
 \keyword{rsf,}
-

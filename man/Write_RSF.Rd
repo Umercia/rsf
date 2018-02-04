@@ -12,7 +12,7 @@ Write_RSF(RSF, output_file_name)
 \item{output_file_name:}{name for the output file. it has to contain the extension .rsf.}
 }
 \description{
-Write an rsf object from memory to a file (*.rsf). This file can be used with Windpro.
+Write a rsf object from memory to a file (*.rsf). This file can be used with Windpro.
 }
 \examples{
 write from memory a rsf (data table) into the file "rsf_80m_Aldermyberget.rsf":
@@ -20,4 +20,3 @@ Write_RSF(rsf80, "rsf_80m_Aldermyberget.rsf")
 }
 \keyword{rsf,}
 \keyword{write}
-
