@@ -66,7 +66,7 @@ Raster plot of A, k and wind speed (Average or Sectorwise). If provided it will 
     + layout_csv:	Input *.csv file name (name should be surrounded by "") containing the WTG positions (X,Y).Default value = NULL. if provided, turbine positions would be plotted on the map.
 ```r
             Example: 
-            Shear_plot(rsf_file1 = "[shear_table][crop_700]Hennoid.csv", layout_csv = "layout V2 Hennoid.csv") 
+            Shear_plot(rsf_file1 = "[shear_table][crop_700]Hennoid.csv", layout_csv = "layout_Hennoid.csv") 
 ```      
       
   * **ShearExtract <- function(shear_csv,layout_csv, output_name = "shear_VSC_input.shr")**  
@@ -79,9 +79,9 @@ Raster plot of A, k and wind speed (Average or Sectorwise). If provided it will 
             ShearExtract("sheartable.csv","layout_Saint_Martin.csv")
 ```    
 
-  * **RSF_scale <- RSF_scale <- function(rsf_file, scale_factor, output_name = rsf_file)**  
-    Scale a rsf file "rsf_file" with the "scale_factor". The new rsf file will be created in the same folder, with the scale factor tagged in the file name.
-    Note that the scaling is purely apply to the A parameter of the weibull distribution (k stay unchanged).
+  * **RSF_scale <- function(rsf_file, scale_factor, output_name = rsf_file)**  
+    Scale a rsf file "rsf_file" with a "scale_factor". The new rsf file will be created in the same folder, with the scale factor tagged in the file name.
+    Note: The scaling is purely apply to the A parameter of the weibull distribution (k stay unchanged).
     + rsf_file:	Input *.rsf file name (name should be surrounded by "").
     + scale_factor: Weibull A values of the rsf will be multiply by this value. Typical value around [0.5;1.5].
     + output_name: Output *.rsf file name " (name should be surrounded by "").
